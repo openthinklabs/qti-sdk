@@ -72,7 +72,7 @@ class VariableMapping extends QtiComponent
      *
      * @return string A QTI identifier.
      */
-    public function getSource()
+    public function getSource(): string
     {
         return $this->source;
     }
@@ -83,12 +83,12 @@ class VariableMapping extends QtiComponent
      * @param string $source A valid QTI identifier.
      * @throws InvalidArgumentException If $source is not a valid QTI identifier.
      */
-    public function setSource($source)
+    public function setSource($source): void
     {
         if (Format::isIdentifier($source)) {
             $this->source = $source;
         } else {
-            $msg = "'${source}' is not a valid QTI identifier.";
+            $msg = "'{$source}' is not a valid QTI identifier.";
             throw new InvalidArgumentException($msg);
         }
     }
@@ -98,7 +98,7 @@ class VariableMapping extends QtiComponent
      *
      * @return string A QTI identifier.
      */
-    public function getTarget()
+    public function getTarget(): string
     {
         return $this->target;
     }
@@ -109,12 +109,12 @@ class VariableMapping extends QtiComponent
      * @param string $target A valid QTI identifier.
      * @throws InvalidArgumentException If $target is not a valid QTI identifier.
      */
-    public function setTarget($target)
+    public function setTarget($target): void
     {
         if (Format::isIdentifier($target)) {
             $this->target = $target;
         } else {
-            $msg = "'${target}' is not a valid QTI identifier.";
+            $msg = "'{$target}' is not a valid QTI identifier.";
             throw new InvalidArgumentException($msg);
         }
     }
@@ -122,7 +122,7 @@ class VariableMapping extends QtiComponent
     /**
      * @return string
      */
-    public function getQtiClassName()
+    public function getQtiClassName(): string
     {
         return 'variableMapping';
     }
@@ -130,7 +130,7 @@ class VariableMapping extends QtiComponent
     /**
      * @return QtiComponentCollection
      */
-    public function getComponents()
+    public function getComponents(): QtiComponentCollection
     {
         return new QtiComponentCollection();
     }

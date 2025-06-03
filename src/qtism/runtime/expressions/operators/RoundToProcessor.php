@@ -68,7 +68,7 @@ class RoundToProcessor extends OperatorProcessor
      * @return null|QtiFloat A single float with the value nearest to that of the expression's value or NULL if the sub-expression is NaN.
      * @throws OperatorProcessingException
      */
-    public function process()
+    public function process(): ?QtiFloat
     {
         $operands = $this->getOperands();
         $state = $this->getState();
@@ -106,10 +106,10 @@ class RoundToProcessor extends OperatorProcessor
             $figures = $state[$figuresIdentifier];
 
             if ($figures === null) {
-                $msg = "The variable '${figuresIdentifier}' used to set up the 'figures' attribute is null or nonexisting.";
+                $msg = "The variable '{$figuresIdentifier}' used to set up the 'figures' attribute is null or nonexisting.";
                 throw new OperatorProcessingException($msg, $this, OperatorProcessingException::NONEXISTENT_VARIABLE);
             } elseif (!$figures instanceof QtiInteger) {
-                $msg = "The variable '${figuresIdentifier}' used to set up the 'figures' attribute is not an integer.";
+                $msg = "The variable '{$figuresIdentifier}' used to set up the 'figures' attribute is not an integer.";
                 throw new OperatorProcessingException($msg, $this, OperatorProcessingException::WRONG_VARIABLE_BASETYPE);
             }
             $figures = $figures->getValue();
@@ -118,7 +118,7 @@ class RoundToProcessor extends OperatorProcessor
         if ($roundingMode === RoundingMode::SIGNIFICANT_FIGURES) {
             if ($figures <= 0) {
                 // As per QTI 2.1 spec.
-                $msg = "The 'figures' attribute must be a non-zero positive integer when mode 'significantFigures' is used, '${figures}' given.";
+                $msg = "The 'figures' attribute must be a non-zero positive integer when mode 'significantFigures' is used, '{$figures}' given.";
                 throw new OperatorProcessingException($msg, $this, OperatorProcessingException::LOGIC_ERROR);
             }
 
@@ -136,7 +136,7 @@ class RoundToProcessor extends OperatorProcessor
         } else {
             // As per QTI 2.1 spec.
             if ($figures < 0) {
-                $msg = "The 'figures' attribute must be a integer greater than or equal to zero when mode 'decimalPlaces' is used, '${figures}' given.";
+                $msg = "The 'figures' attribute must be a integer greater than or equal to zero when mode 'decimalPlaces' is used, '{$figures}' given.";
                 throw new OperatorProcessingException($msg, $this);
             }
 
@@ -147,7 +147,7 @@ class RoundToProcessor extends OperatorProcessor
     /**
      * @return string
      */
-    protected function getExpressionType()
+    protected function getExpressionType(): string
     {
         return RoundTo::class;
     }

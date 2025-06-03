@@ -50,7 +50,7 @@ class ExpressionProcessorFactory implements ProcessorFactory
      * @return Processable The related ExpressionProcessor object.
      * @throws RuntimeException If no ExpressionProcessor can be found for the given $expression.
      */
-    public function createProcessor(QtiComponent $expression)
+    public function createProcessor(QtiComponent $expression): Processable
     {
         $qtiClassName = ucfirst($expression->getQtiClassName());
         $nsPackage = 'qtism\\runtime\\expressions\\';
@@ -61,7 +61,7 @@ class ExpressionProcessorFactory implements ProcessorFactory
             return new $className($expression);
         }
 
-        $msg = "The QTI expression class '${qtiClassName}' has no dedicated ExpressionProcessor class.";
+        $msg = "The QTI expression class '{$qtiClassName}' has no dedicated ExpressionProcessor class.";
         throw new RuntimeException($msg);
     }
 }

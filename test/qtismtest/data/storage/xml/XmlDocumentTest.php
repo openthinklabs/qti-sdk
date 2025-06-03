@@ -25,7 +25,7 @@ use qtismtest\QtiSmTestCase;
  */
 class XmlDocumentTest extends QtiSmTestCase
 {
-    public function testRubricBlockRuptureNoValidation()
+    public function testRubricBlockRuptureNoValidation(): void
     {
         $doc = new XmlDocument();
         $doc->load(self::samplesDir() . 'custom/paper_vs_xsd/rubricblock_other_content_than_block.xml');
@@ -44,7 +44,10 @@ class XmlDocumentTest extends QtiSmTestCase
         $div = $content[4];
         $this::assertInstanceOf(Div::class, $div);
         $divContent = $div->getContent();
-        $this::assertEquals('This div and its inner text are perfectly valid from both XSD and paper spec point of views.', trim($divContent[0]->getContent()));
+        $this::assertEquals(
+            'This div and its inner text are perfectly valid from both XSD and paper spec point of views.',
+            trim($divContent[0]->getContent())
+        );
 
         $a = $content[7];
         $this::assertInstanceOf(A::class, $a);
@@ -52,7 +55,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $this::assertEquals('Go to somewhere...', $aContent[0]->getContent());
     }
 
-    public function testRubricBlockRuptureValidation()
+    public function testRubricBlockRuptureValidation(): void
     {
         $doc = new XmlDocument();
         $file = self::samplesDir() . 'custom/paper_vs_xsd/rubricblock_other_content_than_block.xml';
@@ -61,14 +64,19 @@ class XmlDocumentTest extends QtiSmTestCase
         $valid = false;
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->load($file);
-        $valid = $dom->schemaValidate(__DIR__ . '/../../../../../src/qtism/data/storage/xml/schemes/qtiv2p1/imsqti_v2p1.xsd');
-        $this::assertTrue($valid, 'Even if the content of the rubricBlock is invalid from the paper spec point of view, it is XSD valid. See rupture points.');
+        $valid = $dom->schemaValidate(
+            __DIR__ . '/../../../../../src/qtism/data/storage/xml/schemes/qtiv2p1/imsqti_v2p1.xsd'
+        );
+        $this::assertTrue(
+            $valid,
+            'Even if the content of the rubricBlock is invalid from the paper spec point of view, it is XSD valid.'
+        );
 
         $doc->load($file);
         $this::assertTrue(true);
     }
 
-    public function testTemplateBlockRuptureNoValidation()
+    public function testTemplateBlockRuptureNoValidation(): void
     {
         $doc = new XmlDocument();
         $doc->load(self::samplesDir() . 'custom/paper_vs_xsd/templateblock_other_content_than_block.xml');
@@ -87,7 +95,10 @@ class XmlDocumentTest extends QtiSmTestCase
         $div = $content[4];
         $this::assertInstanceOf(Div::class, $div);
         $divContent = $div->getContent();
-        $this::assertEquals('This div and its inner text are perfectly valid from both XSD and paper spec point of views.', trim($divContent[0]->getContent()));
+        $this::assertEquals(
+            'This div and its inner text are perfectly valid from both XSD and paper spec point of views.',
+            trim($divContent[0]->getContent())
+        );
 
         $a = $content[7];
         $this::assertInstanceOf(A::class, $a);
@@ -95,20 +106,25 @@ class XmlDocumentTest extends QtiSmTestCase
         $this::assertEquals('Go to somewhere...', $aContent[0]->getContent());
     }
 
-    public function testTemplateBlockRuptureValidation()
+    public function testTemplateBlockRuptureValidation(): void
     {
         $doc = new XmlDocument();
         $file = self::samplesDir() . 'custom/paper_vs_xsd/templateblock_other_content_than_block.xml';
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->load($file);
-        $valid = $dom->schemaValidate(__DIR__ . '/../../../../../src/qtism/data/storage/xml/schemes/qtiv2p1/imsqti_v2p1.xsd');
-        $this::assertTrue($valid, 'Even if the content of the templateBlock is invalid from the paper spec point of view, it is XSD valid. See rupture points.');
+        $valid = $dom->schemaValidate(
+            __DIR__ . '/../../../../../src/qtism/data/storage/xml/schemes/qtiv2p1/imsqti_v2p1.xsd'
+        );
+        $this::assertTrue(
+            $valid,
+            'Even if the content of the templateBlock is invalid from the paper spec point of view, it is XSD valid.'
+        );
 
         $doc->load($file);
         $this::assertTrue(true);
     }
 
-    public function testFeedbackBlockRuptureNoValidation()
+    public function testFeedbackBlockRuptureNoValidation(): void
     {
         $doc = new XmlDocument();
         $file = self::samplesDir() . 'custom/paper_vs_xsd/feedbackblock_other_content_than_block.xml';
@@ -131,7 +147,10 @@ class XmlDocumentTest extends QtiSmTestCase
         $div = $content[4];
         $this::assertInstanceOf(Div::class, $div);
         $divContent = $div->getContent();
-        $this::assertEquals('This div and its inner text are perfectly valid from both XSD and paper spec point of views.', trim($divContent[0]->getContent()));
+        $this::assertEquals(
+            'This div and its inner text are perfectly valid from both XSD and paper spec point of views.',
+            trim($divContent[0]->getContent())
+        );
 
         $a = $content[7];
         $this::assertInstanceOf(A::class, $a);
@@ -139,20 +158,25 @@ class XmlDocumentTest extends QtiSmTestCase
         $this::assertEquals('Go to somewhere...', $aContent[0]->getContent());
     }
 
-    public function testFeedbackBlockRuptureValidation()
+    public function testFeedbackBlockRuptureValidation(): void
     {
         $doc = new XmlDocument();
         $file = self::samplesDir() . 'custom/paper_vs_xsd/feedbackblock_other_content_than_block.xml';
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->load($file);
-        $valid = $dom->schemaValidate(__DIR__ . '/../../../../../src/qtism/data/storage/xml/schemes/qtiv2p1/imsqti_v2p1.xsd');
-        $this::assertTrue($valid, 'Even if the content of the feedbackBlock is invalid from the paper spec point of view, it is XSD valid. See rupture points.');
+        $valid = $dom->schemaValidate(
+            __DIR__ . '/../../../../../src/qtism/data/storage/xml/schemes/qtiv2p1/imsqti_v2p1.xsd'
+        );
+        $this::assertTrue(
+            $valid,
+            'Even if the content of the feedbackBlock is invalid from the paper spec point of view, it is XSD valid.'
+        );
 
         $doc->load($file);
         $this::assertTrue(true);
     }
 
-    public function testPromptRuptureNoValidation()
+    public function testPromptRuptureNoValidation(): void
     {
         $doc = new XmlDocument();
         $file = self::samplesDir() . 'custom/paper_vs_xsd/prompt_other_content_than_inlinestatic.xml';
@@ -179,20 +203,25 @@ class XmlDocumentTest extends QtiSmTestCase
         $this::assertEquals('Resistance is futile!', $simpleChoiceContent[0]->getContent());
     }
 
-    public function testPromptRuptureValidation()
+    public function testPromptRuptureValidation(): void
     {
         $doc = new XmlDocument();
         $file = self::samplesDir() . 'custom/paper_vs_xsd/prompt_other_content_than_inlinestatic.xml';
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->load($file);
-        $valid = $dom->schemaValidate(__DIR__ . '/../../../../../src/qtism/data/storage/xml/schemes/qtiv2p1/imsqti_v2p1.xsd');
-        $this::assertTrue($valid, 'Even if the content of the prompt is invalid from the paper spec point of view, it is XSD valid. See rupture points.');
+        $valid = $dom->schemaValidate(
+            __DIR__ . '/../../../../../src/qtism/data/storage/xml/schemes/qtiv2p1/imsqti_v2p1.xsd'
+        );
+        $this::assertTrue(
+            $valid,
+            'Even if the content of the prompt is invalid from the paper spec point of view, it is XSD valid.'
+        );
 
         $doc->load($file);
         $this::assertTrue(true);
     }
 
-    public function testAmps()
+    public function testAmps(): void
     {
         $file = self::samplesDir() . 'custom/amps.xml';
         $doc = new XmlDocument();
@@ -207,13 +236,13 @@ class XmlDocumentTest extends QtiSmTestCase
         $this::assertEquals('Hello there & there! I am trying to make <you> "crazy"', $divText->getcontent());
     }
 
-    public function testWrongVersion()
+    public function testWrongVersion(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $doc = new XMLDocument('2.2.1012');
+        new XMLDocument('2.2.1012');
     }
 
-    public function testLoadFromString()
+    public function testLoadFromString(): void
     {
         $doc = new XmlDocument('2.1');
         $doc->loadFromString('<assessmentItemRef identifier="Q01" href="./Q01.xml"/>');
@@ -224,7 +253,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $this::assertEquals('./Q01.xml', $component->getHref());
     }
 
-    public function testLoadFromEmptyString()
+    public function testLoadFromEmptyString(): void
     {
         $doc = new XmlDocument('2.1');
 
@@ -236,7 +265,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $doc->loadFromString('');
     }
 
-    public function testLoadFromMalformedString()
+    public function testLoadFromMalformedString(): void
     {
         $doc = new XmlDocument('2.1');
 
@@ -258,7 +287,36 @@ class XmlDocumentTest extends QtiSmTestCase
         $doc->loadFromString('<assessmentItem>');
     }
 
-    public function testLoadNoVersion()
+    public function testSerialization(): void
+    {
+        $doc = new XmlDocument('2.1');
+        $doc->loadFromString('<assessmentItemRef identifier="Q01" href="./Q01.xml"/>');
+
+        $this->assertEquals(
+            $doc->saveToString(),
+            unserialize(serialize($doc))->saveToString()
+        );
+    }
+
+    public function testOlderSerializedDataDeserialization(): void
+    {
+        if (PHP_VERSION_ID >= 80100) {
+            $this->markTestSkipped('DOM objects serialization is impossible in PHP 8.1 or higher.');
+        }
+
+        $unserializedDoc = unserialize(file_get_contents(self::samplesDir(). 'serialized/xmldocument'));
+        $this->assertInstanceOf(XmlDocument::class, $unserializedDoc);
+
+        $doc = new XmlDocument('2.1');
+        $doc->loadFromString('<assessmentItemRef identifier="Q01" href="./Q01.xml"/>');
+
+        $this->assertEquals(
+            $doc->saveToString(),
+            $unserializedDoc->saveToString()
+        );
+    }
+
+    public function testLoadNoVersion(): void
     {
         $doc = new XmlDocument('2.1');
 
@@ -266,13 +324,13 @@ class XmlDocumentTest extends QtiSmTestCase
         $this::assertEquals('2.1.0', $doc->getVersion());
     }
 
-    public function testLoadFromNonExistingFile()
+    public function testLoadFromNonExistingFile(): void
     {
         $doc = new XmlDocument('2.1');
         // This path does not resolve anything.
         $path = self::samplesDir() . 'invalid/unknown.xml';
 
-        $expectedMsg = "Cannot load QTI file at path '${path}'. It does not exist or is not readable.";
+        $expectedMsg = "Cannot load QTI file at path '{$path}'. It does not exist or is not readable.";
         $this->expectException(XmlStorageException::class);
         $this->expectExceptionMessage($expectedMsg);
         $this->expectExceptionCode(XmlStorageException::RESOLUTION);
@@ -280,7 +338,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $doc->load($path);
     }
 
-    public function testLoadFromStringNotSupportedElement20()
+    public function testLoadFromStringNotSupportedElement20(): void
     {
         // Will throw an error because assessmentItemRef is not supported in QTI 2.0.
         $doc = new XmlDocument('2.0');
@@ -292,7 +350,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $doc->loadFromString('<assessmentItemRef identifier="Q01" href="./Q01.xml"/>');
     }
 
-    public function testSaveNoMarshaller20()
+    public function testSaveNoMarshaller20(): void
     {
         $doc = new XMLDocument('2.1.1');
         $doc->loadFromString('<assessmentItemRef identifier="Q01" href="./Q01.xml"/>');
@@ -302,10 +360,10 @@ class XmlDocumentTest extends QtiSmTestCase
         $this->expectException(XmlStorageException::class);
         $this->expectExceptionMessage($expectedMsg);
 
-        $str = $doc->saveToString();
+        $doc->saveToString();
     }
 
-    public function testVersionDoesNotChangeLoadFromString()
+    public function testVersionDoesNotChangeLoadFromString(): void
     {
         $doc = new XmlDocument('2.1.1');
         $doc->loadFromString('<assessmentItemRef identifier="Q01" href="./Q01.xml"/>');
@@ -313,20 +371,25 @@ class XmlDocumentTest extends QtiSmTestCase
         $this::assertEquals('2.1.1', $doc->getVersion());
     }
 
-    public function testSaveUnknownLocation()
+    public function testSaveUnknownLocation(): void
     {
+        $qtiPath = '/unknown/location/qti.xml';
+
         $doc = new XmlDocument('2.1.1');
         $doc->loadFromString('<assessmentItemRef identifier="Q01" href="./Q01.xml"/>');
 
-        $expectedMsg = "An error occurred while saving QTI-XML file at '/unknown/location/qti.xml'. Maybe the save location is not reachable?";
+        $expectedMsg = sprintf(
+            'An error occurred while saving QTI-XML file at \'%s\'. Maybe the save location is not reachable?',
+            $qtiPath
+        );
         $this->expectException(XmlStorageException::class);
         $this->expectExceptionMessage($expectedMsg);
         $this->expectExceptionCode(XmlStorageException::WRITE);
 
-        $doc->save('/unknown/location/qti.xml');
+        $doc->save($qtiPath);
     }
 
-    public function testSaveWrongLocationFileSystem()
+    public function testSaveWrongLocationFileSystem(): void
     {
         $doc = new XmlDocument('2.1.1');
         $doc->setFilesystem($this->getOutputFileSystem());
@@ -338,7 +401,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $doc->save('../../../../../../../../unknown/location.xml');
     }
 
-    public function testUnknownClassWhileSavingBecauseOfVersion1()
+    public function testUnknownClassWhileSavingBecauseOfVersion1(): void
     {
         $doc = new XmlDocument('2.1.1');
         $doc->loadFromString('
@@ -355,10 +418,10 @@ class XmlDocumentTest extends QtiSmTestCase
         $this->expectException(XmlStorageException::class);
         $this->expectExceptionMessage($expectedMsg);
         $this->expectExceptionCode(XmlStorageException::VERSION);
-        $str = $doc->saveToString(true);
+        $doc->saveToString();
     }
 
-    public function testUnknownClassWhileLoadingBecauseOfVersion1()
+    public function testUnknownClassWhileLoadingBecauseOfVersion1(): void
     {
         $expectedMsg = "'matchTable' components are not supported in QTI version '2.0.0'";
         $this->expectException(XmlStorageException::class);
@@ -375,14 +438,14 @@ class XmlDocumentTest extends QtiSmTestCase
             </outcomeDeclaration>');
     }
 
-    public function testUnknownClassWhileSavingBecauseOfVersion2()
+    public function testUnknownClassWhileSavingBecauseOfVersion2(): void
     {
         $doc = new XmlDocument('2.1.1');
         $doc->loadFromString('
             <sum>
                 <subtract>
                     <mathConstant name="pi"/>
-                    <mathConstant name="pi"/>            
+                    <mathConstant name="pi"/>
                 </subtract>
             </sum>');
 
@@ -393,10 +456,10 @@ class XmlDocumentTest extends QtiSmTestCase
         $this->expectException(XmlStorageException::class);
         $this->expectExceptionMessage($expectedMsg);
         $this->expectExceptionCode(XmlStorageException::VERSION);
-        $str = $doc->saveToString(true);
+        $doc->saveToString();
     }
 
-    public function testUnknownClassWhileLoadingBecauseOfVersion2()
+    public function testUnknownClassWhileLoadingBecauseOfVersion2(): void
     {
         $expectedMsg = "'mathConstant' components are not supported in QTI version '2.0.0'";
         $this->expectException(XmlStorageException::class);
@@ -413,12 +476,12 @@ class XmlDocumentTest extends QtiSmTestCase
             </sum>');
     }
 
-    public function testUnknownClassWhileSavingBecauseOfVersion3()
+    public function testUnknownClassWhileSavingBecauseOfVersion3(): void
     {
         $doc = new XmlDocument('2.2.0');
         $doc->loadFromString('
             <div>
-                <bdo dir="rtl">I am reversed!</bdo>            
+                <bdo dir="rtl">I am reversed!</bdo>
             </div>');
 
         // This should fail because in QTI 2.2.0 because <bdo> does not exist.
@@ -428,10 +491,10 @@ class XmlDocumentTest extends QtiSmTestCase
         $this->expectException(XmlStorageException::class);
         $this->expectExceptionMessage($expectedMsg);
         $this->expectExceptionCode(XmlStorageException::VERSION);
-        $str = $doc->saveToString(true);
+        $doc->saveToString();
     }
 
-    public function testUnknownClassWhileLoadingBecauseOfVersion3()
+    public function testUnknownClassWhileLoadingBecauseOfVersion3(): void
     {
         $expectedMsg = "'bdo' components are not supported in QTI version '2.0.0'";
         $this->expectException(XmlStorageException::class);
@@ -441,17 +504,22 @@ class XmlDocumentTest extends QtiSmTestCase
         $doc = new XmlDocument('2.0.0');
         $doc->loadFromString('
             <div>
-                <bdo dir="rtl">I am reversed!</bdo>            
+                <bdo dir="rtl">I am reversed!</bdo>
             </div>');
     }
 
-    public function testInvalidAgainstXMLSchema()
+    public function testInvalidAgainstXMLSchema(): void
     {
-        $xsdLocation = realpath(__DIR__ . '/../../../../../src/qtism/data/storage/xml/versions/../schemes/qtiv2p1/imsqti_v2p1.xsd');
-        $expectedMsg = "The document could not be validated with XML Schema '$xsdLocation':\n";
-        $expectedMsg .= "Error: Element '{http://www.imsglobal.org/xsd/imsqti_v2p1}responseDeclaration', attribute 'foo': The attribute 'foo' is not allowed. at 9:0.";
+        $xsdLocation = realpath(
+            __DIR__ . '/../../../../../src/qtism/data/storage/xml/versions/../schemes/qtiv2p1/imsqti_v2p1.xsd'
+        );
+        $expectedMsgParts = [
+            "The document could not be validated with XML Schema '$xsdLocation':\n",
+            'Error: Element \'{http://www.imsglobal.org/xsd/imsqti_v2p1}responseDeclaration\', attribute \'foo\': ',
+            'The attribute \'foo\' is not allowed. at 9:0.',
+        ];
         $this->expectException(XmlStorageException::class);
-        $this->expectExceptionMessage($expectedMsg);
+        $this->expectExceptionMessage(implode('', $expectedMsgParts));
         $this->expectExceptionCode(XmlStorageException::XSD_VALIDATION);
 
         $uri = self::samplesDir() . 'invalid/xsdinvalid.xml';
@@ -459,7 +527,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $doc->load($uri, true);
     }
 
-    public function testXIncludeNoComponent()
+    public function testXIncludeNoComponent(): void
     {
         $doc = new XmlDocument();
 
@@ -468,7 +536,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $doc->xInclude();
     }
 
-    public function testResolveTemplateLocationNoComponent()
+    public function testResolveTemplateLocationNoComponent(): void
     {
         $doc = new XmlDocument();
 
@@ -477,7 +545,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $doc->resolveTemplateLocation();
     }
 
-    public function testIncludeAssessmentSectionRefsNoComponent()
+    public function testIncludeAssessmentSectionRefsNoComponent(): void
     {
         $doc = new XmlDocument();
 
@@ -493,7 +561,7 @@ class XmlDocumentTest extends QtiSmTestCase
      * @throws XmlStorageException
      * @throws MarshallingException
      */
-    public function testSaveNoComponent($file, $filesystem)
+    public function testSaveNoComponent($file, $filesystem): void
     {
         $doc = new XmlDocument();
 
@@ -510,7 +578,7 @@ class XmlDocumentTest extends QtiSmTestCase
     /**
      * @return array
      */
-    public function saveNoComponentProvider()
+    public function saveNoComponentProvider(): array
     {
         return [
             ['path.xml', true],
@@ -518,7 +586,7 @@ class XmlDocumentTest extends QtiSmTestCase
         ];
     }
 
-    public function testLoadFromFileSystemNoValidation()
+    public function testLoadFromFileSystemNoValidation(): void
     {
         $fileSystem = $this->getFileSystem();
         $doc = new XmlDocument();
@@ -528,7 +596,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $this::assertInstanceOf(AssessmentItem::class, $doc->getDocumentComponent());
     }
 
-    public function testLoadFromFileSystemPositiveValidation()
+    public function testLoadFromFileSystemPositiveValidation(): void
     {
         $fileSystem = $this->getFileSystem();
         $doc = new XmlDocument();
@@ -538,7 +606,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $this::assertInstanceOf(AssessmentItem::class, $doc->getDocumentComponent());
     }
 
-    public function testLoadFromFileSystemNegativeValidation()
+    public function testLoadFromFileSystemNegativeValidation(): void
     {
         $fileSystem = $this->getFileSystem();
         $doc = new XmlDocument();
@@ -550,7 +618,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $doc->load('invalid/xsdinvalid.xml', true);
     }
 
-    public function testLoadFromFileSystemNotExistingFile()
+    public function testLoadFromFileSystemNotExistingFile(): void
     {
         $fileSystem = $this->getFileSystem();
         $doc = new XmlDocument();
@@ -558,12 +626,12 @@ class XmlDocumentTest extends QtiSmTestCase
         $path = 'invalid/unknown.xml';
 
         $this->expectException(XmlStorageException::class);
-        $this->expectExceptionMessage("Cannot load QTI file at path '${path}'. It does not exist or is not readable.");
+        $this->expectExceptionMessage("Cannot load QTI file at path '{$path}'. It does not exist or is not readable.");
 
         $doc->load($path);
     }
 
-    public function testLoadFromFileSystemEmptyFile()
+    public function testLoadFromFileSystemEmptyFile(): void
     {
         $fileSystem = $this->getFileSystem();
         $doc = new XmlDocument();
@@ -576,7 +644,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $doc->load($path);
     }
 
-    public function testSaveFileSystem()
+    public function testSaveFileSystem(): void
     {
         $filesystem = $this->getFileSystem();
         $doc = new XmlDocument();
@@ -600,7 +668,7 @@ class XmlDocumentTest extends QtiSmTestCase
      * @param string $expectedVersion
      * @throws XmlStorageException
      */
-    public function testInferQTIVersionValid($file, $expectedVersion)
+    public function testInferQTIVersionValid($file, $expectedVersion): void
     {
         $dom = new XmlDocument();
         $dom->load($file);
@@ -610,14 +678,18 @@ class XmlDocumentTest extends QtiSmTestCase
     /**
      * @return array
      */
-    public function validInferQTIVersionProvider()
+    public function validInferQTIVersionProvider(): array
     {
         return [
             [self::samplesDir() . 'ims/items/2_2/choice_multiple.xml', '2.2.0'],
             [self::samplesDir() . 'ims/items/2_1_1/likert.xml', '2.1.1'],
             [self::samplesDir() . 'ims/items/2_1/associate.xml', '2.1.0'],
             [self::samplesDir() . 'ims/items/2_0/associate.xml', '2.0.0'],
-            [self::samplesDir() . 'ims/tests/arbitrary_collections_of_item_outcomes/arbitrary_collections_of_item_outcomes.xml', '2.1.0'],
+            [
+                self::samplesDir()
+                . 'ims/tests/arbitrary_collections_of_item_outcomes/arbitrary_collections_of_item_outcomes.xml',
+                '2.1.0',
+            ],
             [self::samplesDir() . 'ims/items/2_2_1/choice.xml', '2.2.1'],
             [self::samplesDir() . 'ims/items/2_2_2/choice.xml', '2.2.2'],
             [self::samplesDir() . 'ims/items/2_2_3/choice.xml', '2.2.3'],
@@ -626,7 +698,7 @@ class XmlDocumentTest extends QtiSmTestCase
         ];
     }
 
-    public function testInferVersionWithMissingNamespaceReturnsDefaultVersion()
+    public function testInferVersionWithMissingNamespaceReturnsDefaultVersion(): void
     {
         $xmlDoc = new XmlDocument();
 
@@ -635,7 +707,7 @@ class XmlDocumentTest extends QtiSmTestCase
         $this::assertEquals('2.1.0', $xmlDoc->getVersion());
     }
 
-    public function testInferVersionWithWrongNamespaceThrowsException()
+    public function testInferVersionWithWrongNamespaceThrowsException(): void
     {
         $xmlDoc = new XmlDocument();
 
@@ -652,7 +724,7 @@ class XmlDocumentTest extends QtiSmTestCase
      * @param string $toFile
      * @throws XmlStorageException
      */
-    public function testChangeVersion($fromVersion, $fromFile, $toVersion, $toFile)
+    public function testChangeVersion($fromVersion, $fromFile, $toVersion, $toFile): void
     {
         $doc = new XmlDocument($fromVersion);
         $doc->load($fromFile);
@@ -682,7 +754,7 @@ class XmlDocumentTest extends QtiSmTestCase
         ];
     }
 
-    public function testChangeVersionWithUnknownVersionThrowsException()
+    public function testChangeVersionWithUnknownVersionThrowsException(): void
     {
         $wrongVersion = '36.15';
         $patchedWrongVersion = $wrongVersion . '.0';

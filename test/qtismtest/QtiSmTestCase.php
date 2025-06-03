@@ -6,11 +6,11 @@ use DateTime;
 use DateTimeZone;
 use DOMDocument;
 use DOMElement;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use qtism\data\QtiComponent;
+use qtism\data\storage\xml\filesystem\FilesystemFactory;
+use qtism\data\storage\xml\filesystem\FilesystemInterface;
 use qtism\data\storage\xml\marshalling\MarshallerFactory;
 use qtism\data\storage\xml\marshalling\MarshallerNotFoundException;
 use qtism\data\storage\xml\versions\QtiVersion;
@@ -23,12 +23,12 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
 abstract class QtiSmTestCase extends TestCase
 {
     /**
-     * @var Filesystem
+     * @var FilesystemInterface
      */
     private $fileSystem = null;
 
     /**
-     * @var Filesystem
+     * @var FilesystemInterface
      */
     private $outputFileSystem = null;
 
@@ -37,12 +37,10 @@ abstract class QtiSmTestCase extends TestCase
         parent::setUp();
 
         // Set up File System Local adapter for testing.
-        $adapter = new Local(self::samplesDir());
-        $this->setFileSystem(new Filesystem($adapter));
+        $this->setFileSystem(FilesystemFactory::local(self::samplesDir()));
 
         // Set up File System Local adapter for output.
-        $adapter = new Local(sys_get_temp_dir() . '/qsmout');
-        $this->setOutputFileSystem(new Filesystem($adapter));
+        $this->setOutputFileSystem(FilesystemFactory::local(sys_get_temp_dir() . '/qsmout'));
     }
 
     public function tearDown(): void
@@ -55,9 +53,9 @@ abstract class QtiSmTestCase extends TestCase
      *
      * Setup the FileSystem implementation to be used for testing.
      *
-     * @return Filesystem
+     * @return FilesystemInterface
      */
-    protected function getFileSystem()
+    protected function getFileSystem(): FilesystemInterface
     {
         return $this->fileSystem;
     }
@@ -67,9 +65,9 @@ abstract class QtiSmTestCase extends TestCase
      *
      * Setup the FileSystem implementation to be used for testing.
      *
-     * @param Filesystem $filesystem
+     * @param FilesystemInterface $filesystem
      */
-    protected function setFileSystem(Filesystem $filesystem)
+    protected function setFileSystem(FilesystemInterface $filesystem): void
     {
         $this->fileSystem = $filesystem;
     }
@@ -79,9 +77,9 @@ abstract class QtiSmTestCase extends TestCase
      *
      * Setup the FileSystem implementation to be used for testing.
      *
-     * @return Filesystem
+     * @return FilesystemInterface
      */
-    protected function getOutputFileSystem()
+    protected function getOutputFileSystem(): FilesystemInterface
     {
         return $this->outputFileSystem;
     }
@@ -91,9 +89,9 @@ abstract class QtiSmTestCase extends TestCase
      *
      * Setup the FileSystem implementation to be used for testing.
      *
-     * @param Filesystem $filesystem
+     * @param FilesystemInterface $filesystem
      */
-    protected function setOutputFileSystem(Filesystem $filesystem)
+    protected function setOutputFileSystem(FilesystemInterface $filesystem): void
     {
         $this->outputFileSystem = $filesystem;
     }
@@ -127,7 +125,7 @@ abstract class QtiSmTestCase extends TestCase
      *
      * @return string
      */
-    public static function samplesDir()
+    public static function samplesDir(): string
     {
         return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'samples' . DIRECTORY_SEPARATOR;
     }
@@ -138,7 +136,7 @@ abstract class QtiSmTestCase extends TestCase
      * @return string The path to the created directory.
      * @throws RuntimeException If the directory has not been created.
      */
-    public static function tempDir()
+    public static function tempDir(): string
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'qsm');
 
@@ -162,7 +160,7 @@ abstract class QtiSmTestCase extends TestCase
      * @param string $source The source file to be copied.
      * @return string The path to the copied file.
      */
-    public static function tempCopy($source)
+    public static function tempCopy($source): string
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'qsm');
 
@@ -182,7 +180,7 @@ abstract class QtiSmTestCase extends TestCase
      * @param string $xmlString A string containing XML markup
      * @return DOMElement The according DOMElement;
      */
-    public function createDOMElement($xmlString)
+    public function createDOMElement($xmlString): DOMElement
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->loadXML($xmlString);
@@ -197,7 +195,7 @@ abstract class QtiSmTestCase extends TestCase
      * @param string $tz A timezone name.
      * @return DateTime
      */
-    public static function createDate($date, $tz = 'UTC')
+    public static function createDate($date, $tz = 'UTC'): DateTime
     {
         return DateTime::createFromFormat('Y-m-d H:i:s', $date, new DateTimeZone($tz));
     }
@@ -210,7 +208,7 @@ abstract class QtiSmTestCase extends TestCase
      * @return QtiComponent
      * @throws MarshallerNotFoundException
      */
-    public function createComponentFromXml($xmlString, $version = '2.1.0')
+    public function createComponentFromXml($xmlString, $version = '2.1.0'): QtiComponent
     {
         $element = $this->createDOMElement($xmlString);
         $factory = $this->getMarshallerFactory($version);

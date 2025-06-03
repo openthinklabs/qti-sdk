@@ -44,7 +44,7 @@ class ItemSessionControl extends QtiComponent
      * that any applicable feedback must be shown. This applies to both Modal
      * Feedback and Integrated Feedback where applicable. However, once the
      * maximum number of allowed attempts have been used (or for adaptive items,
-     * completionStatus has been set to completed) whether or not feedback is shown
+     * completionStatus has been set to completed) whether feedback is shown
      * is controlled by the showFeedback constraint.
      *
      * @var int
@@ -101,7 +101,7 @@ class ItemSessionControl extends QtiComponent
     /**
      * From IMS QTI:
      *
-     * This constraint controls whether or not the system may provide the candidate with a
+     * This constraint controls whether the system may provide the candidate with a
      * way of entering the solution state. The default is false.
      *
      * @var bool
@@ -114,7 +114,7 @@ class ItemSessionControl extends QtiComponent
      *
      * Some delivery systems support the capture of candidate comments. The comment is not
      * part of the assessed responses but provides feedback from the candidate to the other
-     * actors in the assessment process. This constraint controls whether or not the candidate
+     * actors in the assessment process. This constraint controls whether the candidate
      * is allowed to provide a comment on the item during the session.
      *
      * @var bool
@@ -163,7 +163,7 @@ class ItemSessionControl extends QtiComponent
      *
      * @return int An integer.
      */
-    public function getMaxAttempts()
+    public function getMaxAttempts(): int
     {
         return $this->maxAttempts;
     }
@@ -174,7 +174,7 @@ class ItemSessionControl extends QtiComponent
      * @param int $maxAttempts An integer.
      * @throws InvalidArgumentException If $maxAttempts is not an integer.
      */
-    public function setMaxAttempts($maxAttempts)
+    public function setMaxAttempts($maxAttempts): void
     {
         if (is_int($maxAttempts)) {
             $this->maxAttempts = $maxAttempts;
@@ -189,7 +189,7 @@ class ItemSessionControl extends QtiComponent
      *
      * @return bool true if feedbacks must be shown, otherwise false.
      */
-    public function mustShowFeedback()
+    public function mustShowFeedback(): bool
     {
         return $this->showFeedback;
     }
@@ -200,7 +200,7 @@ class ItemSessionControl extends QtiComponent
      * @param bool $showFeedback true if feedbacks must be shown, otherwise false.
      * @throws InvalidArgumentException If $showFeedback is not a boolean value.
      */
-    public function setShowFeedback($showFeedback)
+    public function setShowFeedback($showFeedback): void
     {
         if (is_bool($showFeedback)) {
             $this->showFeedback = $showFeedback;
@@ -215,7 +215,7 @@ class ItemSessionControl extends QtiComponent
      *
      * @return bool true if allowed, false if not allowed.
      */
-    public function doesAllowReview()
+    public function doesAllowReview(): bool
     {
         return $this->allowReview;
     }
@@ -227,7 +227,7 @@ class ItemSessionControl extends QtiComponent
      * @param bool $allowReview true if allowed, false if not.
      * @throws InvalidArgumentException If $allowReview is not a boolean.
      */
-    public function setAllowReview($allowReview)
+    public function setAllowReview($allowReview): void
     {
         if (is_bool($allowReview)) {
             $this->allowReview = $allowReview;
@@ -242,7 +242,7 @@ class ItemSessionControl extends QtiComponent
      *
      * @return bool true if the candidate can, false if not.
      */
-    public function mustShowSolution()
+    public function mustShowSolution(): bool
     {
         return $this->showSolution;
     }
@@ -253,7 +253,7 @@ class ItemSessionControl extends QtiComponent
      * @param bool $showSolution true if he is provided, false if not.
      * @throws InvalidArgumentException If $showSolution is not a boolean.
      */
-    public function setShowSolution($showSolution)
+    public function setShowSolution($showSolution): void
     {
         if (is_bool($showSolution)) {
             $this->showSolution = $showSolution;
@@ -268,7 +268,7 @@ class ItemSessionControl extends QtiComponent
      *
      * @return bool true if allowed, false if not.
      */
-    public function doesAllowComment()
+    public function doesAllowComment(): bool
     {
         return $this->allowComment;
     }
@@ -279,7 +279,7 @@ class ItemSessionControl extends QtiComponent
      * @param bool $allowComment true if allowed, false if not.
      * @throws InvalidArgumentException If $allowComment is not a boolean.
      */
-    public function setAllowComment($allowComment)
+    public function setAllowComment($allowComment): void
     {
         if (is_bool($allowComment)) {
             $this->allowComment = $allowComment;
@@ -292,11 +292,11 @@ class ItemSessionControl extends QtiComponent
     /**
      * Is the candidate allowed to skip items?
      *
-     * Know whether or not the Delivery Engine allow the candidate to skip items.
+     * Know whether the Delivery Engine allow the candidate to skip items.
      *
      * @return bool true if allowed, false if not.
      */
-    public function doesAllowSkipping()
+    public function doesAllowSkipping(): bool
     {
         return $this->allowSkipping;
     }
@@ -304,12 +304,12 @@ class ItemSessionControl extends QtiComponent
     /**
      * Set if the candidate is allowed to skip items.
      *
-     * Set whether or not the Delivery Engine allows the candidate to skip items.
+     * Set whether the Delivery Engine allows the candidate to skip items.
      *
      * @param bool $allowSkipping true if allowed, false otherwise.
      * @throws InvalidArgumentException If $allowSkipping is not a valid boolean.
      */
-    public function setAllowSkipping($allowSkipping)
+    public function setAllowSkipping($allowSkipping): void
     {
         if (is_bool($allowSkipping)) {
             $this->allowSkipping = $allowSkipping;
@@ -324,7 +324,7 @@ class ItemSessionControl extends QtiComponent
      *
      * @return bool true if responses must be validated, false if not.
      */
-    public function mustValidateResponses()
+    public function mustValidateResponses(): bool
     {
         return $this->validateResponses;
     }
@@ -336,7 +336,7 @@ class ItemSessionControl extends QtiComponent
      *
      * @return bool
      */
-    public function isDefault()
+    public function isDefault(): bool
     {
         return $this->getMaxAttempts() === 1 &&
             $this->mustShowFeedback() === false &&
@@ -350,12 +350,12 @@ class ItemSessionControl extends QtiComponent
     /**
      * Set if the responses must be validated.
      *
-     * Set whether or not responses must be validated by the Delivery Engine.
+     * Set whether responses must be validated by the Delivery Engine.
      *
      * @param bool $validateResponses true if responses must be validated, false if not.
      * @throws InvalidArgumentException If $validateResponses is not a boolean.
      */
-    public function setValidateResponses($validateResponses)
+    public function setValidateResponses($validateResponses): void
     {
         if (is_bool($validateResponses)) {
             $this->validateResponses = $validateResponses;
@@ -368,7 +368,7 @@ class ItemSessionControl extends QtiComponent
     /**
      * @return string
      */
-    public function getQtiClassName()
+    public function getQtiClassName(): string
     {
         return 'itemSessionControl';
     }
@@ -376,7 +376,7 @@ class ItemSessionControl extends QtiComponent
     /**
      * @return QtiComponentCollection
      */
-    public function getComponents()
+    public function getComponents(): QtiComponentCollection
     {
         return new QtiComponentCollection();
     }

@@ -26,6 +26,8 @@ namespace qtism\data\storage\xml\marshalling;
 use DOMElement;
 use InvalidArgumentException;
 use qtism\data\ExternalQtiComponent;
+use qtism\data\content\xhtml\html5\Figure;
+use qtism\data\content\xhtml\html5\Figcaption;
 use qtism\data\QtiComponent;
 use qtism\data\storage\xml\QtiNamespaced;
 use qtism\data\storage\xml\Utils;
@@ -49,7 +51,7 @@ abstract class MarshallerFactory
     private $mapping = [];
 
     /**
-     * Whether or not element and attribute serialization must be Web Component friendly.
+     * Whether element and attribute serialization must be Web Component friendly.
      *
      * @var bool
      */
@@ -299,7 +301,7 @@ abstract class MarshallerFactory
      * @param string $marshallerClassName A PHP marshaller class name (fully qualified).
      * @param string $ns
      */
-    public function addMappingEntry($qtiClassName, $marshallerClassName, $ns = 'qtism')
+    public function addMappingEntry($qtiClassName, $marshallerClassName, $ns = 'qtism'): void
     {
         $this->mapping[$ns][$qtiClassName] = $marshallerClassName;
     }
@@ -311,7 +313,7 @@ abstract class MarshallerFactory
      * @param string $ns
      * @return bool Whether a mapping entry is defined.
      */
-    public function hasMappingEntry($qtiClassName, $ns = 'qtism')
+    public function hasMappingEntry($qtiClassName, $ns = 'qtism'): bool
     {
         return isset($this->mapping[$ns][$qtiClassName]);
     }
@@ -334,7 +336,7 @@ abstract class MarshallerFactory
      * @param string $qtiClassName A QTI class name.
      * @param string $ns
      */
-    public function removeMappingEntry($qtiClassName, $ns = 'qtism')
+    public function removeMappingEntry($qtiClassName, $ns = 'qtism'): void
     {
         unset($this->mapping[$ns][$qtiClassName]);
     }
@@ -342,11 +344,11 @@ abstract class MarshallerFactory
     /**
      * Set Web Componenent Friendship
      *
-     * Sets whether or not consider Web Component friendly QTI components.
+     * Sets whether consider Web Component friendly QTI components.
      *
      * @param bool $webComponentFriendly
      */
-    protected function setWebComponentFriendly($webComponentFriendly)
+    protected function setWebComponentFriendly($webComponentFriendly): void
     {
         $this->webComponentFriendly = $webComponentFriendly;
     }
@@ -354,11 +356,11 @@ abstract class MarshallerFactory
     /**
      * Web Component Friendship Status
      *
-     * Whether or not Web Component friendly QTI components are considered.
+     * Whether Web Component friendly QTI components are considered.
      *
      * @return bool
      */
-    public function isWebComponentFriendly()
+    public function isWebComponentFriendly(): bool
     {
         return $this->webComponentFriendly;
     }
@@ -378,7 +380,7 @@ abstract class MarshallerFactory
      * @throws MarshallerNotFoundException If no Marshaller mapping is set for a given $object.
      * @throws InvalidArgumentException If $object is not a QtiComponent nor a DOMElement object.
      */
-    public function createMarshaller($object, array $args = [])
+    public function createMarshaller($object, array $args = []): Marshaller
     {
         if ($object instanceof QtiComponent) {
             // Asking for a Marshaller...
@@ -403,11 +405,11 @@ abstract class MarshallerFactory
                     $class = new ReflectionClass($this->getMappingEntry($qtiClassName));
                 } else {
                     // No qtiClassName/mapping entry found.
-                    $msg = "No mapping entry found for QTI class name '${qtiClassName}'.";
+                    $msg = "No mapping entry found for QTI class name '{$qtiClassName}'.";
                     throw new MarshallerNotFoundException($msg, $qtiClassName);
                 }
             } catch (ReflectionException $e) {
-                $msg = "No marshaller implementation could be found for component '${qtiClassName}'.";
+                $msg = "No marshaller implementation could be found for component '{$qtiClassName}'.";
                 throw new MarshallerNotFoundException($msg, $qtiClassName, $e);
             }
 
@@ -426,5 +428,6 @@ abstract class MarshallerFactory
      * @param array $args
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     abstract protected function instantiateMarshaller(ReflectionClass $class, array $args);
 }

@@ -5,11 +5,15 @@ namespace qtismtest\runtime\storage\binary;
 use qtism\common\collections\IdentifierCollection;
 use qtism\common\Comparable;
 use qtism\common\datatypes\files\FileHash;
+use qtism\common\datatypes\files\FileManager;
+use qtism\common\datatypes\files\FileManagerException;
 use qtism\common\datatypes\files\FileSystemFile;
 use qtism\common\datatypes\files\FileSystemFileManager;
 use qtism\common\datatypes\QtiBoolean;
+use qtism\common\datatypes\QtiDatatype;
 use qtism\common\datatypes\QtiDirectedPair;
 use qtism\common\datatypes\QtiDuration;
+use qtism\common\datatypes\QtiFile;
 use qtism\common\datatypes\QtiFloat;
 use qtism\common\datatypes\QtiIdentifier;
 use qtism\common\datatypes\QtiInteger;
@@ -21,9 +25,11 @@ use qtism\common\datatypes\QtiUri;
 use qtism\common\enums\BaseType;
 use qtism\common\enums\Cardinality;
 use qtism\common\storage\BinaryStreamAccessException;
+use qtism\common\storage\IStream;
 use qtism\common\storage\MemoryStream;
 use qtism\common\storage\MemoryStreamException;
 use qtism\common\storage\StreamAccessException;
+use qtism\common\storage\StreamException;
 use qtism\data\ItemSessionControl;
 use qtism\data\NavigationMode;
 use qtism\data\state\CorrectResponse;
@@ -44,6 +50,7 @@ use qtism\runtime\common\State;
 use qtism\runtime\common\TemplateVariable;
 use qtism\runtime\common\Variable;
 use qtism\runtime\common\VariableFactory;
+use qtism\runtime\common\VariableFactoryInterface;
 use qtism\runtime\storage\binary\QtiBinaryStreamAccess;
 use qtism\runtime\storage\binary\QtiBinaryStreamAccessException;
 use qtism\runtime\storage\binary\QtiBinaryVersion;
@@ -58,6 +65,8 @@ use ReflectionProperty;
  */
 class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
 {
+    private const EXPECTED_FILE_IDENTIFIER_ENCODING_MASK = '%s : %s';
+
     /**
      * @dataProvider readVariableValueProvider
      *
@@ -69,7 +78,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
      * @throws MemoryStreamException
      * @throws StreamAccessException
      */
-    public function testReadVariableValue(Variable $variable, $binary, $expectedValue, $valueType = QtiBinaryStreamAccess::RW_VALUE)
+    public function testReadVariableValue(Variable $variable, $binary, $expectedValue, $valueType = QtiBinaryStreamAccess::RW_VALUE): void
     {
         $stream = new MemoryStream($binary);
         $stream->open();
@@ -106,14 +115,14 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
             $this::assertTrue($expectedValue->equals($variable->$getterToCall()));
         } else {
             // can't happen.
-            $this::assertTrue(false);
+            $this::fail();
         }
     }
 
     /**
      * @return array
      */
-    public function readVariableValueProvider()
+    public function readVariableValueProvider(): array
     {
         $returnValue = [];
 
@@ -466,7 +475,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         return $returnValue;
     }
 
-    public function testReadVariableValueEmptyStream()
+    public function testReadVariableValueEmptyStream(): void
     {
         // Empty stream.
         $stream = new MemoryStream('');
@@ -482,7 +491,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         );
     }
 
-    public function testReadVariableValueTypeMismatch()
+    public function testReadVariableValueTypeMismatch(): void
     {
         // 'XYZ' is not a valid duration datatype.
         $bin = "\x00" . "\x01" . pack('S', 3) . 'XYZ';
@@ -510,7 +519,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
      * @throws MemoryStreamException
      * @throws StreamAccessException
      */
-    public function testWriteVariableValue(Variable $variable, $valueType = QtiBinaryStreamAccess::RW_VALUE)
+    public function testWriteVariableValue(Variable $variable, $valueType = QtiBinaryStreamAccess::RW_VALUE): void
     {
         $stream = new MemoryStream();
         $stream->open();
@@ -565,14 +574,14 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
             $this::assertTrue($readValue->equals($originalValue));
         } else {
             // Unknown datatype.
-            $this::assertTrue(false);
+            $this::fail();
         }
     }
 
     /**
      * @return array
      */
-    public function writeVariableValueProvider()
+    public function writeVariableValueProvider(): array
     {
         $rw_value = QtiBinaryStreamAccess::RW_VALUE;
         $rw_defaultValue = QtiBinaryStreamAccess::RW_DEFAULTVALUE;
@@ -886,7 +895,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         return $data;
     }
 
-    public function testWriteVariableValueClosedStream()
+    public function testWriteVariableValueClosedStream(): void
     {
         $stream = new MemoryStream();
         $stream->open();
@@ -901,7 +910,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->writeVariableValue($var, $type);
     }
 
-    public function testReadAssessmentItemSession1()
+    public function testReadAssessmentItemSession1(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/itemsubset.xml');
@@ -919,8 +928,19 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $timeReference = pack('l', 1378302030); //  Wednesday, September 4th 2013, 13:40:30 (GMT)
         $varCount = pack('l', 2); // 2 variables (SCORE & RESPONSE).
 
-        $score = pack('S', 0) . pack('S', 8) . "\x00" . "\x00" . "\x00" . "\x01" . pack('d', 1.0); // 9th (8 + 1) outcomeDeclaration.
-        $response = pack('S', 1) . pack('S', 0) . "\x00" . "\x00" . "\x00" . "\x01" . pack('S', 7) . 'ChoiceA'; // 1st (0 + 1) responseDeclaration.
+        // 9th (8 + 1) outcomeDeclaration.
+        $score = pack('S', 0)
+                 . pack('S', 8)
+                 . "\x00\x00\x00\x01"
+                 . pack('d', 1.0)
+                 . "\x00";
+        // 1st (0 + 1) responseDeclaration.
+        $response = pack('S', 1)
+                    . pack('S', 0)
+                    . "\x00\x00\x00\x01"
+                    . pack('S', 7)
+                    . 'ChoiceA'
+                    . "\x00";
 
         $shufflingCount = "\x00"; // No shuffling states.
         $bin = implode('', [$position, $state, $navigationMode, $submissionMode, $attempting, $hasItemSessionControl, $numAttempts, $duration, $completionStatus, $hasTimeReference, $timeReference, $varCount, $score, $response, $shufflingCount]);
@@ -952,7 +972,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
     /**
      * @depends testReadAssessmentItemSession1
      */
-    public function testReadAssessmentItemSession2()
+    public function testReadAssessmentItemSession2(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/templatevariables_in_items.xml');
@@ -1001,7 +1021,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access = new QtiBinaryStreamAccess($stream, new FileSystemFileManager(), new VariableFactory());
         $seeker = new AssessmentTestSeeker($doc->getDocumentComponent(), ['assessmentItemRef', 'outcomeDeclaration', 'responseDeclaration', 'templateDeclaration', 'itemSessionControl']);
 
-        $version = $this->createVersionMock(QtiBinaryVersion::CURRENT_VERSION);
+        $version = $this->createVersionMock(QtiBinaryVersion::VERSION_VARIABLE_COUNT_INTEGER);
         $session = $access->readAssessmentItemSession(new SessionManager(new FileSystemFileManager()), $seeker, $version);
 
         $this::assertEquals('Q01', $session->getAssessmentItem()->getIdentifier());
@@ -1024,7 +1044,155 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $this::assertSame(10, $session['TPL']->getValue());
     }
 
-    public function testWriteAssessmentItemSession1()
+    /**
+     * @depends testReadAssessmentItemSession1
+     */
+    public function testReadAssessmentItemSession3(): void
+    {
+        $doc = new XmlCompactDocument();
+        $doc->load(self::samplesDir() . 'custom/runtime/templatevariables_in_items.xml');
+
+        $position = pack('S', 0); // Q01
+        $state = "\x04"; // CLOSED
+        $navigationMode = "\x01"; // NONLINEAR
+        $submissionMode = "\x01"; // SIMULTANEOUS
+        $attempting = "\x00"; // false
+        $hasItemSessionControl = "\x00"; // false
+        $numAttempts = "\x01"; // 1
+        $duration = pack('S', 5) . 'PT20S'; // 20 seconds recorded.
+        $completionStatus = pack('S', 8) . 'complete';
+        $hasTimeReference = "\x01"; // true
+        $timeReference = pack('l', 1378302030); //  Wednesday, September 4th 2013, 13:40:30 (GMT)
+        $varCount = pack('l', 3); // 3 variables (SCORE & RESPONSE & TPL)
+
+        // 1st (0 + 1) outcomeDeclaration.
+        $score = pack('S', 0)
+                 . pack('S', 0)
+                 . "\x01\x00\x00\x01"
+                 . pack('d', 1.0)
+                 . "\x00\x01"
+                 . pack('d', 1.0)
+                 . "\x00";
+        // 1st (0 + 1) responseDeclaration.
+        $response = pack('S', 1)
+                    . pack('S', 0)
+                    . "\x00\x01\x00\x01"
+                    . pack('S', 7)
+                    . 'ChoiceA'
+                    . "\x00\x01"
+                    . pack('S', 7)
+                    . 'ChoiceA'
+                    . "\x00";
+        // 1st (0 + 1) templateDeclaration.
+        $template = pack('S', 2)
+                    . pack('S', 0)
+                    . "\x00\x00\x00\x01"
+                    . pack('l', 10)
+                    . "\x00";
+
+        $shufflingCount = "\x00"; // No shuffling states.
+
+        $binArray = [
+            $position,
+            $state,
+            $navigationMode,
+            $submissionMode,
+            $attempting,
+            $hasItemSessionControl,
+            $numAttempts,
+            $duration,
+            $completionStatus,
+            $hasTimeReference,
+            $timeReference,
+            $varCount,
+            $score,
+            $response,
+            $template,
+            $shufflingCount,
+        ];
+
+        $bin = implode('', $binArray);
+        $stream = new MemoryStream($bin);
+        $stream->open();
+        $access = new QtiBinaryStreamAccess($stream, new FileSystemFileManager(), new VariableFactory());
+        $seeker = new AssessmentTestSeeker($doc->getDocumentComponent(), ['assessmentItemRef', 'outcomeDeclaration', 'responseDeclaration', 'templateDeclaration', 'itemSessionControl']);
+
+        $version = $this->createVersionMock(QtiBinaryVersion::CURRENT_VERSION);
+        $session = $access->readAssessmentItemSession(new SessionManager(new FileSystemFileManager()), $seeker, $version);
+
+        $this::assertEquals('Q01', $session->getAssessmentItem()->getIdentifier());
+        $this::assertEquals(AssessmentItemSessionState::CLOSED, $session->getState());
+        $this::assertEquals(NavigationMode::NONLINEAR, $session->getNavigationMode());
+        $this::assertEquals(SubmissionMode::SIMULTANEOUS, $session->getSubmissionMode());
+        $this::assertFalse($session->isAttempting());
+        $this::assertEquals(1, $session['numAttempts']->getValue());
+        $this::assertEquals('PT20S', $session['duration']->__toString());
+        $this::assertEquals('complete', $session['completionStatus']->getValue());
+        $this::assertInstanceOf(OutcomeVariable::class, $session->getVariable('SCORE'));
+        $this::assertInstanceOf(QtiFloat::class, $session['SCORE']);
+        $this::assertEquals(1.0, $session['SCORE']->getValue());
+        $this::assertInstanceOf(QtiDatatype::class, $session->getVariable('SCORE')->getDefaultValue());
+        $this::assertEquals(1.0, $session->getVariable('SCORE')->getDefaultValue()->getValue());
+        $this::assertInstanceOf(ResponseVariable::class, $session->getVariable('RESPONSE'));
+        $this::assertSame(BaseType::IDENTIFIER, $session->getVariable('RESPONSE')->getBaseType());
+        $this::assertInstanceOf(QtiString::class, $session['RESPONSE']);
+        $this->assertInstanceOf(ResponseVariable::class, $session->getVariable('RESPONSE'));
+        $this::assertEquals('ChoiceA', $session->getVariable('RESPONSE')->getCorrectResponse()->getValue());
+        $this::assertEquals('ChoiceA', $session['RESPONSE']->getValue());
+        $this::assertInstanceOf(TemplateVariable::class, $session->getVariable('TPL'));
+        $this::assertInstanceOf(QtiInteger::class, $session['TPL']);
+        $this::assertSame(10, $session['TPL']->getValue());
+    }
+
+    public function testReadAssessmentItemSession4(): void
+    {
+        $doc = new XmlCompactDocument();
+        $doc->load(self::samplesDir() . 'custom/runtime/itemsubset.xml');
+
+        $position = pack('S', 0); // Q01
+        $state = "\x01"; // INTERACTING
+        $navigationMode = "\x00"; // LINEAR
+        $submissionMode = "\x00"; // INDIVIDUAL
+        $attempting = "\x00"; // false -> Here we assume we're in version >= 2.
+        $hasItemSessionControl = "\x00"; // false
+        $numAttempts = "\x02"; // 2
+        $duration = pack('S', 4) . 'PT0S'; // 0 seconds recorded yet.
+        $completionStatus = pack('S', 10) . 'incomplete';
+        $hasTimeReference = "\x01"; // true
+        $timeReference = pack('l', 1378302030); //  Wednesday, September 4th 2013, 13:40:30 (GMT)
+        $varCount = pack('l', 2); // 2 variables (SCORE & RESPONSE).
+
+        $score = pack('S', 0) . pack('S', 8) . "\x00" . "\x00" . "\x00" . "\x01" . pack('d', 1.0); // 9th (8 + 1) outcomeDeclaration.
+        $response = pack('S', 1) . pack('S', 0) . "\x00" . "\x00" . "\x00" . "\x01" . pack('S', 7) . 'ChoiceA'; // 1st (0 + 1) responseDeclaration.
+
+        $shufflingCount = "\x00"; // No shuffling states.
+        $bin = implode('', [$position, $state, $navigationMode, $submissionMode, $attempting, $hasItemSessionControl, $numAttempts, $duration, $completionStatus, $hasTimeReference, $timeReference, $varCount, $score, $response, $shufflingCount]);
+        $stream = new MemoryStream($bin);
+        $stream->open();
+        $access = new QtiBinaryStreamAccess($stream, new FileSystemFileManager(), new VariableFactory());
+        $seeker = new AssessmentTestSeeker($doc->getDocumentComponent(), ['assessmentItemRef', 'outcomeDeclaration', 'responseDeclaration', 'itemSessionControl']);
+
+        $version = $this->createVersionMock(QtiBinaryVersion::VERSION_VARIABLE_COUNT_INTEGER);
+        $session = $access->readAssessmentItemSession(new SessionManager(new FileSystemFileManager()), $seeker, $version);
+
+        $this::assertEquals('Q01', $session->getAssessmentItem()->getIdentifier());
+        $this::assertEquals(AssessmentItemSessionState::INTERACTING, $session->getState());
+        $this::assertEquals(NavigationMode::LINEAR, $session->getNavigationMode());
+        $this::assertEquals(SubmissionMode::INDIVIDUAL, $session->getSubmissionMode());
+        $this::assertFalse($session->isAttempting());
+        $this::assertEquals(2, $session['numAttempts']->getValue());
+        $this::assertEquals('PT0S', $session['duration']->__toString());
+        $this::assertEquals('incomplete', $session['completionStatus']->getValue());
+        $this::assertInstanceOf(OutcomeVariable::class, $session->getVariable('scoring'));
+        $this::assertInstanceOf(QtiFloat::class, $session['scoring']);
+        $this::assertEquals(1.0, $session['scoring']->getValue());
+        $this::assertInstanceOf(ResponseVariable::class, $session->getVariable('RESPONSE'));
+        $this::assertEquals(BaseType::IDENTIFIER, $session->getVariable('RESPONSE')->getBaseType());
+        $this::assertInstanceOf(QtiString::class, $session['RESPONSE']);
+        $this::assertEquals('ChoiceA', $session['RESPONSE']->getValue());
+    }
+
+    public function testWriteAssessmentItemSession1(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/itemsubset.xml');
@@ -1055,7 +1223,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $this::assertFalse($session->hasTimeReference());
     }
 
-    public function testWriteAssessmentItemSession2()
+    public function testWriteAssessmentItemSession2(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/templatevariables_in_items.xml');
@@ -1087,7 +1255,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $this::assertFalse($session->hasTimeReference());
     }
 
-    public function testWriteAssessmentItemSession()
+    public function testWriteAssessmentItemSession(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/itemsubset.xml');
@@ -1121,7 +1289,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
     /**
      * @depends testWriteAssessmentItemSession
      */
-    public function testWriteAssessmentItemSessionNotDefaultItemSessionControl()
+    public function testWriteAssessmentItemSessionNotDefaultItemSessionControl(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/itemsubset.xml');
@@ -1153,7 +1321,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
     /**
      * @depends testWriteAssessmentItemSession
      */
-    public function testWriteAssessmentItemSessionCorrectResponseChanged()
+    public function testWriteAssessmentItemSessionCorrectResponseChanged(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/itemsubset.xml');
@@ -1188,7 +1356,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
     /**
      * @depends testWriteAssessmentItemSession
      */
-    public function testWriteAssessmentItemSessionWithShufflingState()
+    public function testWriteAssessmentItemSessionWithShufflingState(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/itemsubset.xml');
@@ -1220,7 +1388,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
     /**
      * @depends testWriteAssessmentItemSession
      */
-    public function testWriteAssessmentItemSessionWrongSeeker()
+    public function testWriteAssessmentItemSessionWrongSeeker(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/itemsubset.xml');
@@ -1242,7 +1410,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->writeAssessmentItemSession($wrongSeeker, $session);
     }
 
-    public function testWriteAssessmentItemSessionClosedStream()
+    public function testWriteAssessmentItemSessionClosedStream(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/itemsubset.xml');
@@ -1263,7 +1431,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->writeAssessmentItemSession($seeker, $session);
     }
 
-    public function testReadRouteItem()
+    public function testReadRouteItem(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/itemsubset.xml');
@@ -1292,7 +1460,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $this::assertCount(0, $routeItem->getPreConditions());
     }
 
-    public function testWriteRouteItem()
+    public function testWriteRouteItem(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/itemsubset.xml');
@@ -1322,7 +1490,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $this::assertCount(0, $routeItem->getPreConditions());
     }
 
-    public function testReadPendingResponses()
+    public function testReadPendingResponses(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/itemsubset_simultaneous.xml');
@@ -1352,7 +1520,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $this::assertIsInt($pendingResponses->getOccurence());
     }
 
-    public function testWritePendingResponses()
+    public function testWritePendingResponses(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/itemsubset_simultaneous.xml');
@@ -1383,7 +1551,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $this::assertIsInt($pendingResponses->getOccurence());
     }
 
-    public function testReadShufflingGroup()
+    public function testReadShufflingGroup(): void
     {
         $bin = '';
         $bin .= "\x03"; // identifier-count = 3
@@ -1402,7 +1570,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $this::assertEquals(['id2'], $shufflingGroup->getFixedIdentifiers()->getArrayCopy());
     }
 
-    public function testReadShufflingGroupEmptyStream()
+    public function testReadShufflingGroupEmptyStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1414,7 +1582,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $shufflingGroup = $access->readShufflingGroup();
     }
 
-    public function testWriteShufflingGroup()
+    public function testWriteShufflingGroup(): void
     {
         $shufflingGroup = new ShufflingGroup(new IdentifierCollection(['id1', 'id2', 'id3']));
         $shufflingGroup->setFixedIdentifiers(new IdentifierCollection(['id2']));
@@ -1431,7 +1599,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $this::assertEquals(['id2'], $shufflingGroup->getFixedIdentifiers()->getArrayCopy());
     }
 
-    public function testWriteShufflingGroupClosedStream()
+    public function testWriteShufflingGroupClosedStream(): void
     {
         $shufflingGroup = new ShufflingGroup(new IdentifierCollection(['id1', 'id2', 'id3']));
         $shufflingGroup->setFixedIdentifiers(new IdentifierCollection(['id2']));
@@ -1447,7 +1615,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $shufflingGroup = $access->writeShufflingGroup($shufflingGroup);
     }
 
-    public function testReadShufflingState()
+    public function testReadShufflingState(): void
     {
         $bin = '';
 
@@ -1475,7 +1643,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $this::assertEquals(['id2'], $shufflingGroups[0]->getFixedIdentifiers()->getArrayCopy());
     }
 
-    public function testReadShufflingStateEmptyStream()
+    public function testReadShufflingStateEmptyStream(): void
     {
         $stream = new MemoryStream();
         $stream->open();
@@ -1487,7 +1655,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $shufflingGroup = $access->readShufflingState();
     }
 
-    public function testWriteShufflingState()
+    public function testWriteShufflingState(): void
     {
         $shufflingGroup = new ShufflingGroup(new IdentifierCollection(['id1', 'id2', 'id3']));
         $shufflingGroup->setFixedIdentifiers(new IdentifierCollection(['id2']));
@@ -1509,7 +1677,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $this::assertEquals(['id2'], $shufflingGroups[0]->getFixedIdentifiers()->getArrayCopy());
     }
 
-    public function testWriteShufflingStateClosedStream()
+    public function testWriteShufflingStateClosedStream(): void
     {
         $shufflingGroup = new ShufflingGroup(new IdentifierCollection(['id1', 'id2', 'id3']));
         $shufflingGroup->setFixedIdentifiers(new IdentifierCollection(['id2']));
@@ -1528,7 +1696,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $shufflingGroup = $access->writeShufflingState($shuffling);
     }
 
-    public function testReadRecordFieldEmptyStream()
+    public function testReadRecordFieldEmptyStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1540,7 +1708,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->readRecordField();
     }
 
-    public function testWriteRecordFieldClosedStream()
+    public function testWriteRecordFieldClosedStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1553,7 +1721,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->writeRecordField(['key', new QtiString('string')]);
     }
 
-    public function testReadIdentifierEmptyStream()
+    public function testReadIdentifierEmptyStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1565,7 +1733,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->readIdentifier();
     }
 
-    public function testWriteIdentifierClosedStream()
+    public function testWriteIdentifierClosedStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1578,7 +1746,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->writeIdentifier('identifier');
     }
 
-    public function testReadPointEmptyStream()
+    public function testReadPointEmptyStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1590,7 +1758,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->readPoint();
     }
 
-    public function testWritePointClosedStream()
+    public function testWritePointClosedStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1603,7 +1771,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->writePoint(new QtiPoint(0, 0));
     }
 
-    public function testReadPairEmptyStream()
+    public function testReadPairEmptyStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1615,7 +1783,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->readPair();
     }
 
-    public function testWritePairClosedStream()
+    public function testWritePairClosedStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1628,7 +1796,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->writePair(new QtiPair('A', 'B'));
     }
 
-    public function testReadDirectedPairEmptyStream()
+    public function testReadDirectedPairEmptyStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1640,7 +1808,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->readDirectedPair();
     }
 
-    public function testWriteDirectedPairClosedStream()
+    public function testWriteDirectedPairClosedStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1653,7 +1821,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->writeDirectedPair(new QtiDirectedPair('A', 'B'));
     }
 
-    public function testReadDurationEmptyStream()
+    public function testReadDurationEmptyStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1665,7 +1833,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->readDuration();
     }
 
-    public function testWriteDurationClosedStream()
+    public function testWriteDurationClosedStream(): void
     {
         $stream = new MemoryStream();
         $stream->open();
@@ -1678,7 +1846,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->writeDuration(new QtiDuration('PT0S'));
     }
 
-    public function testReadUriEmptyStream()
+    public function testReadUriEmptyStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1690,7 +1858,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->readUri();
     }
 
-    public function testWriteUriClosedStream()
+    public function testWriteUriClosedStream(): void
     {
         $stream = new MemoryStream();
         $stream->open();
@@ -1703,7 +1871,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->writeUri(new QtiUri('http://www.taotesting.com'));
     }
 
-    public function testReadIntOrIdentifierEmptyStream()
+    public function testReadIntOrIdentifierEmptyStream(): void
     {
         $stream = new MemoryStream('');
         $stream->open();
@@ -1715,7 +1883,7 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $access->readIntOrIdentifier();
     }
 
-    public function testWriteIntOrIdentifierClosedStream()
+    public function testWriteIntOrIdentifierClosedStream(): void
     {
         $stream = new MemoryStream();
         $stream->open();
@@ -1726,6 +1894,255 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
 
         $stream->close();
         $access->writeIntOrIdentifier(new QtiIntOrIdentifier('identifier'));
+    }
+
+
+    public function testSuccessfulWriteFileWithFileHash(): void
+    {
+        $streamMock = $this->createMock(IStream::class);
+        $fileManagerMock = $this->createMock(FileManager::class);
+        $variableFactoryMock = $this->createMock(VariableFactoryInterface::class);
+
+        $streamMock->method('isOpen')->willReturn(true);
+
+        $subject = new QtiBinaryStreamAccess($streamMock, $fileManagerMock, $variableFactoryMock);
+
+        $file = new FileHash('id', 'text\css', 'main.css', md5('content'));
+        $jsonFileHash = json_encode($file);
+        $streamMock->expects(self::once())
+            ->method('write')
+            ->with(pack('S', strlen($jsonFileHash)) . $jsonFileHash);
+
+        $subject->writeFile($file);
+    }
+
+    public function testFailedWriteFileWithFileHash(): void
+    {
+        $streamMock = $this->createMock(IStream::class);
+        $fileManagerMock = $this->createMock(FileManager::class);
+        $variableFactoryMock = $this->createMock(VariableFactoryInterface::class);
+
+        $streamMock->method('isOpen')->willReturn(true);
+
+        $subject = new QtiBinaryStreamAccess($streamMock, $fileManagerMock, $variableFactoryMock);
+
+        $file = new FileHash('id', 'text\css', 'main.css', md5('content'));
+        $jsonFileHash = json_encode($file);
+        $streamMock->expects(self::once())
+            ->method('write')
+            ->with(pack('S', strlen($jsonFileHash)) . $jsonFileHash)
+            ->willThrowException($this->createStreamException('message', $streamMock));
+
+        $this->expectException(BinaryStreamAccessException::class);
+        $subject->writeFile($file);
+    }
+
+    public function testSuccessfulReadFileWithFileHash(): void
+    {
+        $streamMock = $this->createMock(IStream::class);
+        $fileManagerMock = $this->createMock(FileManager::class);
+        $variableFactoryMock = $this->createMock(VariableFactoryInterface::class);
+
+        $streamMock->method('isOpen')->willReturn(true);
+
+        $subject = new QtiBinaryStreamAccess($streamMock, $fileManagerMock, $variableFactoryMock);
+
+        $file = new FileHash('id', 'text\css', 'main.css', md5('content'));
+        $jsonFileHash = json_encode($file);
+        $streamMock->expects(self::exactly(2))
+            ->method('read')
+            ->withConsecutive([2], [strlen($jsonFileHash)])
+            ->willReturnOnConsecutiveCalls(
+                pack('S', strlen($jsonFileHash)),
+                $jsonFileHash
+            );
+
+        self::assertInstanceOf(FileHash::class, $subject->readFile());
+    }
+
+    public function testFailedReadFileWithFileHash(): void
+    {
+        $streamMock = $this->createMock(IStream::class);
+        $streamMock->method('isOpen')->willReturn(true);
+
+        $fileManagerMock = $this->createMock(FileManager::class);
+        $variableFactoryMock = $this->createMock(VariableFactoryInterface::class);
+
+        $subject = new QtiBinaryStreamAccess($streamMock, $fileManagerMock, $variableFactoryMock);
+
+        $streamMock->expects(self::once())
+            ->method('read')
+            ->with(2)
+            ->willThrowException($this->createStreamException('message', $streamMock));
+
+        $this->expectException(BinaryStreamAccessException::class);
+        $subject->readFile();
+    }
+
+    public function testSuccessfulWriteFileWithNotFileHash(): void
+    {
+        $streamMock = $this->createMock(IStream::class);
+        $fileManagerMock = $this->createMock(FileManager::class);
+        $variableFactoryMock = $this->createMock(VariableFactoryInterface::class);
+
+        $streamMock->method('isOpen')->willReturn(true);
+
+        $subject = new QtiBinaryStreamAccess($streamMock, $fileManagerMock, $variableFactoryMock);
+
+        $file = $this->createMock(QtiFile::class);
+        $fileIdentifier = 'file/identifier/or/path';
+        $fileName = 'fileName';
+        $file->expects(self::once())->method('getIdentifier')->willReturn($fileIdentifier);
+        $file->expects(self::once())->method('getFilename')->willReturn($fileName);
+        $fileString = sprintf(self::EXPECTED_FILE_IDENTIFIER_ENCODING_MASK, $fileIdentifier, $fileName);
+
+        $streamMock->expects(self::once())
+            ->method('write')
+            ->with(pack('S', strlen($fileString)) . $fileString);
+
+        $subject->writeFile($file);
+    }
+
+    public function testSuccessfulWriteFileWithNotFileHashWithoutFilename(): void
+    {
+        $streamMock = $this->createMock(IStream::class);
+        $fileManagerMock = $this->createMock(FileManager::class);
+        $variableFactoryMock = $this->createMock(VariableFactoryInterface::class);
+
+        $streamMock->method('isOpen')->willReturn(true);
+
+        $subject = new QtiBinaryStreamAccess($streamMock, $fileManagerMock, $variableFactoryMock);
+
+        $file = $this->createMock(QtiFile::class);
+        $fileIdentifier = 'file/identifier/or/path';
+        $fileName = '';
+        $file->expects(self::once())->method('getIdentifier')->willReturn($fileIdentifier);
+        $file->expects(self::once())->method('getFilename')->willReturn($fileName);
+        $fileString = sprintf(self::EXPECTED_FILE_IDENTIFIER_ENCODING_MASK, $fileIdentifier, $fileName);
+
+        $streamMock->expects(self::once())
+            ->method('write')
+            ->with(pack('S', strlen($fileString)) . $fileString);
+
+        $subject->writeFile($file);
+    }
+
+    public function testFailedWriteFileWithNotFileHash(): void
+    {
+        $streamMock = $this->createMock(IStream::class);
+        $fileManagerMock = $this->createMock(FileManager::class);
+        $variableFactoryMock = $this->createMock(VariableFactoryInterface::class);
+
+        $streamMock->method('isOpen')->willReturn(true);
+
+        $subject = new QtiBinaryStreamAccess($streamMock, $fileManagerMock, $variableFactoryMock);
+
+        $file = $this->createMock(QtiFile::class);
+        $fileIdentifier = 'file/identifier/or/path';
+        $fileName = 'fileName';
+        $file->expects(self::once())->method('getIdentifier')->willReturn($fileIdentifier);
+        $file->expects(self::once())->method('getFilename')->willReturn($fileName);
+        $fileString = sprintf(self::EXPECTED_FILE_IDENTIFIER_ENCODING_MASK, $fileIdentifier, $fileName);
+        $streamMock->expects(self::once())
+            ->method('write')
+            ->with(pack('S', strlen($fileString)) . $fileString)
+            ->willThrowException($this->createStreamException('message', $streamMock));
+
+        $this->expectException(BinaryStreamAccessException::class);
+        $subject->writeFile($file);
+    }
+
+    public function testSuccessfulReadFileWithNotFileHash(): void
+    {
+        $streamMock = $this->createMock(IStream::class);
+        $fileManagerMock = $this->createMock(FileManager::class);
+        $variableFactoryMock = $this->createMock(VariableFactoryInterface::class);
+
+        $streamMock->method('isOpen')->willReturn(true);
+
+        $subject = new QtiBinaryStreamAccess($streamMock, $fileManagerMock, $variableFactoryMock);
+
+        $file = $this->createMock(QtiFile::class);
+        $fileIdentifier = 'file/identifier/or/path';
+        $fileName = 'fileName';
+        $fileString = sprintf(self::EXPECTED_FILE_IDENTIFIER_ENCODING_MASK, $fileIdentifier, $fileName);
+
+        $streamMock->expects(self::exactly(2))
+            ->method('read')
+            ->withConsecutive([2], [strlen($fileString)])
+            ->willReturnOnConsecutiveCalls(
+                pack('S', strlen($fileString)),
+                $fileString
+            );
+
+        $fileManagerMock->expects(self::once())
+            ->method('retrieve')
+            ->with($fileIdentifier, $fileName)
+            ->willReturn($file);
+
+        self::assertInstanceOf(get_class($file), $subject->readFile());
+    }
+
+    public function testSuccessfulReadFileWithNotFileHashWithoutFileName(): void
+    {
+        $streamMock = $this->createMock(IStream::class);
+        $fileManagerMock = $this->createMock(FileManager::class);
+        $variableFactoryMock = $this->createMock(VariableFactoryInterface::class);
+
+        $streamMock->method('isOpen')->willReturn(true);
+
+        $subject = new QtiBinaryStreamAccess($streamMock, $fileManagerMock, $variableFactoryMock);
+
+        $file = $this->createMock(QtiFile::class);
+        $fileIdentifier = 'file/identifier/or/path';
+        $fileName = null;
+        $fileString = sprintf(self::EXPECTED_FILE_IDENTIFIER_ENCODING_MASK, $fileIdentifier, $fileName);
+
+        $streamMock->expects(self::exactly(2))
+            ->method('read')
+            ->withConsecutive([2], [strlen($fileString)])
+            ->willReturnOnConsecutiveCalls(
+                pack('S', strlen($fileString)),
+                $fileString
+            );
+
+        $fileManagerMock->expects(self::once())
+            ->method('retrieve')
+            ->with($fileIdentifier, $fileName)
+            ->willReturn($file);
+
+        self::assertInstanceOf(get_class($file), $subject->readFile());
+    }
+
+    public function testFailedRetrieveReadFileWithFileHash(): void
+    {
+        $streamMock = $this->createMock(IStream::class);
+        $fileManagerMock = $this->createMock(FileManager::class);
+        $variableFactoryMock = $this->createMock(VariableFactoryInterface::class);
+
+        $streamMock->method('isOpen')->willReturn(true);
+
+        $subject = new QtiBinaryStreamAccess($streamMock, $fileManagerMock, $variableFactoryMock);
+
+        $fileIdentifier = 'file/identifier/or/path';
+        $fileName = 'fileName';
+        $fileString = sprintf(self::EXPECTED_FILE_IDENTIFIER_ENCODING_MASK, $fileIdentifier, $fileName);
+
+        $streamMock->expects(self::exactly(2))
+            ->method('read')
+            ->withConsecutive([2], [strlen($fileString)])
+            ->willReturnOnConsecutiveCalls(
+                pack('S', strlen($fileString)),
+                $fileString
+            );
+
+        $fileManagerMock->expects(self::once())
+            ->method('retrieve')
+            ->with($fileIdentifier, $fileName)
+            ->willThrowException(new FileManagerException('message'));
+
+        $this->expectException(FileManagerException::class);
+        $subject->readFile();
     }
 
     /**
@@ -1741,5 +2158,16 @@ class QtiBinaryStreamAccessTest extends QtiSmAssessmentItemTestCase
         $property->setAccessible(false);
 
         return $version;
+    }
+
+
+    private function createStreamException(string $message, IStream $stream): StreamException
+    {
+        return new class($message, $stream) extends StreamException {
+            public function __construct($message, IStream $source, $code = 0, \Exception $previous = null)
+            {
+                parent::__construct($message, $source, $code, $previous);
+            }
+        };
     }
 }

@@ -43,7 +43,7 @@ class RandomFloatProcessor extends ExpressionProcessor
      * @return QtiFloat A Random float value.
      * @throws ExpressionProcessingException
      */
-    public function process()
+    public function process(): QtiFloat
     {
         $expr = $this->getExpression();
         $min = $expr->getMin();
@@ -58,7 +58,7 @@ class RandomFloatProcessor extends ExpressionProcessor
             if ($min <= $max) {
                 return new QtiFloat(($min + lcg_value() * (abs($max - $min))));
             } else {
-                $msg = "'min':'${min}' is greater than 'max':'${max}'.";
+                $msg = "'min':'{$min}' is greater than 'max':'{$max}'.";
                 throw new ExpressionProcessingException($msg, $this, ExpressionProcessingException::LOGIC_ERROR);
             }
         } else {
@@ -70,7 +70,7 @@ class RandomFloatProcessor extends ExpressionProcessor
     /**
      * @return string
      */
-    protected function getExpressionType()
+    protected function getExpressionType(): string
     {
         return RandomFloat::class;
     }

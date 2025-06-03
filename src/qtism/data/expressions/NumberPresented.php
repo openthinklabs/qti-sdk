@@ -28,7 +28,7 @@ namespace qtism\data\expressions;
  *
  * This expression, which can only be used in outcomes processing, calculates the
  * number of items in a given sub-set that have been attempted (at least once).
- * In other words, items with which the user has interacted, whether or not they
+ * In other words, items with which the user has interacted, whether they
  * provided a response. The result is an integer with single cardinality.
  */
 class NumberPresented extends ItemSubset
@@ -36,7 +36,7 @@ class NumberPresented extends ItemSubset
     /**
      * @return string
      */
-    public function getQtiClassName()
+    public function getQtiClassName(): string
     {
         return 'numberPresented';
     }

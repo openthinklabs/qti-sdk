@@ -46,7 +46,7 @@ class RandomIntegerProcessor extends ExpressionProcessor
      * @return QtiInteger A random integer value.
      * @throws ExpressionProcessingException
      */
-    public function process()
+    public function process(): QtiInteger
     {
         $expr = $this->getExpression();
         $min = $expr->getMin();
@@ -60,7 +60,7 @@ class RandomIntegerProcessor extends ExpressionProcessor
 
         if (is_int($min) && is_int($max) && is_int($step)) {
             if ($min > $max) {
-                $msg = "'min':'${min}' is greater than 'max':'${max}'.";
+                $msg = "'min':'{$min}' is greater than 'max':'{$max}'.";
                 throw new ExpressionProcessingException($msg, $this, ExpressionProcessingException::LOGIC_ERROR);
             }
 
@@ -80,7 +80,7 @@ class RandomIntegerProcessor extends ExpressionProcessor
     /**
      * @return string
      */
-    protected function getExpressionType()
+    protected function getExpressionType(): string
     {
         return RandomInteger::class;
     }

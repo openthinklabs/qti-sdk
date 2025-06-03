@@ -41,7 +41,7 @@ class QtiComponentCollection extends AbstractCollection
      *
      * @throws InvalidArgumentException If $value is not a QtiComponent object.
      */
-    protected function checkType($value)
+    protected function checkType($value): void
     {
         if (!$value instanceof QtiComponent) {
             $msg = "QtiComponentCollection class only accept QtiComponent objects, '" . get_class($value) . "' given.";
@@ -53,12 +53,12 @@ class QtiComponentCollection extends AbstractCollection
      * @param mixed $offset
      * @param mixed $value
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (empty($offset)) {
             parent::offsetSet($offset, $value);
         } else {
-            $msg = "QtiComponentCollection must be used as a bag (specific key '${offset}' given).";
+            $msg = "QtiComponentCollection must be used as a bag (specific key '{$offset}' given).";
             throw new RuntimeException($msg);
         }
     }
@@ -66,12 +66,12 @@ class QtiComponentCollection extends AbstractCollection
     /**
      * @param mixed $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         if (empty($offset)) {
             parent::offsetUnset($offset);
         } else {
-            $msg = "QtiComponentCollection must be used as a bag (specific key '${offset}' given).";
+            $msg = "QtiComponentCollection must be used as a bag (specific key '{$offset}' given).";
             throw new RuntimeException($msg);
         }
     }

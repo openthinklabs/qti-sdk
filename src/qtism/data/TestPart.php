@@ -153,7 +153,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @return string A QTI identifier.
      */
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return $this->identifier;
     }
@@ -164,13 +164,13 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      * @param string $identifier A QTI Identifier.
      * @throws InvalidArgumentException If $identifier is not a valid QTI Identifier.
      */
-    public function setIdentifier($identifier)
+    public function setIdentifier($identifier): void
     {
         if (Format::isIdentifier($identifier, false)) {
             $this->identifier = $identifier;
             $this->notify();
         } else {
-            $msg = "'${identifier}' is not a valid QTI Identifier.";
+            $msg = "'{$identifier}' is not a valid QTI Identifier.";
             throw new InvalidArgumentException($msg);
         }
     }
@@ -180,7 +180,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @return int A value of the Navigation enumeration.
      */
-    public function getNavigationMode()
+    public function getNavigationMode(): int
     {
         return $this->navigationMode;
     }
@@ -191,12 +191,12 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      * @param int $navigationMode A value of the Navigation enumaration.
      * @throws InvalidArgumentException If $navigation mode is not a value from the Navigation enumeration.
      */
-    public function setNavigationMode($navigationMode)
+    public function setNavigationMode($navigationMode): void
     {
         if (in_array($navigationMode, NavigationMode::asArray())) {
             $this->navigationMode = $navigationMode;
         } else {
-            $msg = "'${navigationMode}' is not a valid value for NavigationMode.";
+            $msg = "'{$navigationMode}' is not a valid value for NavigationMode.";
             throw new InvalidArgumentException($msg);
         }
     }
@@ -206,7 +206,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @return int A value of the SubmissionMode enumeration.
      */
-    public function getSubmissionMode()
+    public function getSubmissionMode(): int
     {
         return $this->submissionMode;
     }
@@ -217,12 +217,12 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      * @param int $submissionMode A value of the SubmissionMode enumeration.
      * @throws InvalidArgumentException If $submissionMode is not a value from the SubmissionMode enumeration.
      */
-    public function setSubmissionMode($submissionMode)
+    public function setSubmissionMode($submissionMode): void
     {
         if (in_array($submissionMode, SubmissionMode::asArray())) {
             $this->submissionMode = $submissionMode;
         } else {
-            $msg = "'${submissionMode}' is not a valid value for SubmissionMode.";
+            $msg = "'{$submissionMode}' is not a valid value for SubmissionMode.";
             throw new InvalidArgumentException($msg);
         }
     }
@@ -232,7 +232,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @return PreConditionCollection A collection of PreCondition objects.
      */
-    public function getPreConditions()
+    public function getPreConditions(): PreConditionCollection
     {
         return $this->preConditions;
     }
@@ -242,7 +242,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @param PreConditionCollection $preConditions A collection of PreCondition objects.
      */
-    public function setPreConditions(PreConditionCollection $preConditions)
+    public function setPreConditions(PreConditionCollection $preConditions): void
     {
         $this->preConditions = $preConditions;
     }
@@ -252,7 +252,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @return BranchRuleCollection A collection of BranchRule objects.
      */
-    public function getBranchRules()
+    public function getBranchRules(): BranchRuleCollection
     {
         return $this->branchRules;
     }
@@ -262,7 +262,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @param BranchRuleCollection $branchRules A collection of BranchRule objects.
      */
-    public function setBranchRules(BranchRuleCollection $branchRules)
+    public function setBranchRules(BranchRuleCollection $branchRules): void
     {
         $this->branchRules = $branchRules;
     }
@@ -273,7 +273,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @return ItemSessionControl An ItemSessionControl object.
      */
-    public function getItemSessionControl()
+    public function getItemSessionControl(): ?ItemSessionControl
     {
         return $this->itemSessionControl;
     }
@@ -283,7 +283,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @param ItemSessionControl $itemSessionControl An ItemSessionControl object.
      */
-    public function setItemSessionControl(ItemSessionControl $itemSessionControl = null)
+    public function setItemSessionControl(ItemSessionControl $itemSessionControl = null): void
     {
         $this->itemSessionControl = $itemSessionControl;
     }
@@ -293,7 +293,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @return bool
      */
-    public function hasItemSessionControl()
+    public function hasItemSessionControl(): bool
     {
         return $this->getItemSessionControl() !== null;
     }
@@ -304,7 +304,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @return TimeLimits A TimeLimits object.
      */
-    public function getTimeLimits()
+    public function getTimeLimits(): ?TimeLimits
     {
         return $this->timeLimits;
     }
@@ -315,7 +315,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @param TimeLimits $timeLimits A TimeLimits object.
      */
-    public function setTimeLimits(TimeLimits $timeLimits = null)
+    public function setTimeLimits(TimeLimits $timeLimits = null): void
     {
         $this->timeLimits = $timeLimits;
     }
@@ -325,7 +325,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @return bool
      */
-    public function hasTimeLimits()
+    public function hasTimeLimits(): bool
     {
         return $this->getTimeLimits() !== null;
     }
@@ -335,7 +335,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @return SectionPartCollection A collection of AssessmentSection and/or AssessmentSectionRef objects.
      */
-    public function getAssessmentSections()
+    public function getAssessmentSections(): SectionPartCollection
     {
         return $this->assessmentSections;
     }
@@ -346,22 +346,26 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      * @param SectionPartCollection $assessmentSections A collection of AssessmentSection and/or AssessmentSectionRef objects.
      * @throws InvalidArgumentException If $assessmentSections is an empty collection or contains something else than AssessmentSection and/or AssessmentSectionRef objects.
      */
-    public function setAssessmentSections(SectionPartCollection $assessmentSections)
+    public function setAssessmentSections(SectionPartCollection $assessmentSections): void
     {
-        if (count($assessmentSections) > 0) {
-            // Check that we have only AssessmentSection and/ord AssessmentSectionRef objects.
-            foreach ($assessmentSections as $assessmentSection) {
-                if (!$assessmentSection instanceof AssessmentSection && !$assessmentSection instanceof AssessmentSectionRef) {
-                    $msg = 'A TestPart contain only contain AssessmentSection or AssessmentSectionRef objects.';
-                    throw new InvalidArgumentException($msg);
-                }
-            }
-
-            $this->assessmentSections = $assessmentSections;
-        } else {
-            $msg = 'A TestPart must contain at least one AssessmentSection.';
-            throw new InvalidArgumentException($msg);
+        if ($assessmentSections->isEmpty()) {
+            throw new InvalidArgumentException('A TestPart must contain at least one AssessmentSection.');
         }
+
+        foreach ($assessmentSections as $assessmentSection) {
+            if (
+                !$assessmentSection instanceof AssessmentSection
+                && !$assessmentSection instanceof AssessmentSectionRef
+            ) {
+                throw new InvalidArgumentException(
+                    'A TestPart contain only contain AssessmentSection or AssessmentSectionRef objects.'
+                );
+            }
+        }
+
+        $assessmentSection->setIsLast(true);
+
+        $this->assessmentSections = $assessmentSections;
     }
 
     /**
@@ -369,7 +373,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @return TestFeedbackCollection A collection of TestFeedback objects.
      */
-    public function getTestFeedbacks()
+    public function getTestFeedbacks(): TestFeedbackCollection
     {
         return $this->testFeedbacks;
     }
@@ -379,7 +383,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
      *
      * @param TestFeedbackCollection $testFeedbacks A collection of TestFeedback objects.
      */
-    public function setTestFeedbacks(TestFeedbackCollection $testFeedbacks)
+    public function setTestFeedbacks(TestFeedbackCollection $testFeedbacks): void
     {
         $this->testFeedbacks = $testFeedbacks;
     }
@@ -387,7 +391,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
     /**
      * @return string
      */
-    public function getQtiClassName()
+    public function getQtiClassName(): string
     {
         return 'testPart';
     }
@@ -395,7 +399,7 @@ class TestPart extends QtiComponent implements QtiIdentifiable
     /**
      * @return QtiComponentCollection
      */
-    public function getComponents()
+    public function getComponents(): QtiComponentCollection
     {
         $comp = array_merge(
             $this->getAssessmentSections()->getArrayCopy(),
@@ -418,5 +422,12 @@ class TestPart extends QtiComponent implements QtiIdentifiable
     public function __clone()
     {
         $this->setObservers(new SplObjectStorage());
+    }
+
+    public function isLastSection(AssessmentSection $assessmentSection): bool
+    {
+        $sections = $this->getAssessmentSections()->getArrayCopy();
+
+        return end($sections) === $assessmentSection;
     }
 }

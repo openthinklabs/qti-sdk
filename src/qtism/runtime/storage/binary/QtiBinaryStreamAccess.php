@@ -96,6 +96,8 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
         self::ENCODED_TEMPLATE_DECLARATION => 'templateDeclaration',
     ];
 
+    private const FILE_IDENTIFIER_ENCODING_MASK = '%s : %s';
+
     /** @var FileManager */
     private $fileManager;
 
@@ -124,7 +126,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      *
      * @param FileManager $fileManager A FileManager object.
      */
-    protected function setFileManager(FileManager $fileManager)
+    protected function setFileManager(FileManager $fileManager): void
     {
         $this->fileManager = $fileManager;
     }
@@ -134,7 +136,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      *
      * @return FileManager
      */
-    protected function getFileManager()
+    protected function getFileManager(): FileManager
     {
         return $this->fileManager;
     }
@@ -147,7 +149,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @param int The kind of value to be read (self::RW_VALUE | self::RW_DEFAULTVALUE | self::RW_CORRECTRESPONSE)
      * @throws BinaryStreamAccessException If an error occurs at the binary level.
      */
-    public function readVariableValue(Variable $variable, $valueType = self::RW_VALUE)
+    public function readVariableValue(Variable $variable, $valueType = self::RW_VALUE): void
     {
         switch ($valueType) {
             case self::RW_DEFAULTVALUE:
@@ -195,7 +197,9 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
                     $variable->$setterToCall(Utils::valueToRuntime($this->$toCall(), $baseType));
                 } else {
                     // Deal with multiple values.
-                    $values = ($cardinality === Cardinality::MULTIPLE) ? new MultipleContainer($baseType) : new OrderedContainer($baseType);
+                    $values = $cardinality === Cardinality::MULTIPLE
+                        ? new MultipleContainer($baseType)
+                        : new OrderedContainer($baseType);
                     for ($i = 0; $i < $count; $i++) {
                         $isNull = $this->readBoolean();
                         $values[] = ($isNull === true) ? null : Utils::valueToRuntime($this->$toCall(), $baseType);
@@ -220,7 +224,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @param int $valueType
      * @throws QtiBinaryStreamAccessException
      */
-    public function writeVariableValue(Variable $variable, $valueType = self::RW_VALUE)
+    public function writeVariableValue(Variable $variable, $valueType = self::RW_VALUE): void
     {
         switch ($valueType) {
             case self::RW_DEFAULTVALUE:
@@ -301,7 +305,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @return array An array where the value at index 0 is the key string and index 1 is the value.
      * @throws QtiBinaryStreamAccessException
      */
-    public function readRecordField($isNull = false)
+    public function readRecordField($isNull = false): array
     {
         try {
             $key = $this->readString();
@@ -329,7 +333,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @param bool $isNull
      * @throws QtiBinaryStreamAccessException
      */
-    public function writeRecordField(array $recordField, $isNull = false)
+    public function writeRecordField(array $recordField, $isNull = false): void
     {
         try {
             $this->writeBoolean($isNull);
@@ -357,7 +361,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @return string An identifier.
      * @throws QtiBinaryStreamAccessException
      */
-    public function readIdentifier()
+    public function readIdentifier(): string
     {
         try {
             return $this->readString();
@@ -373,7 +377,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @param string $identifier A QTI Identifier.
      * @throws QtiBinaryStreamAccessException
      */
-    public function writeIdentifier($identifier)
+    public function writeIdentifier($identifier): void
     {
         try {
             $this->writeString($identifier);
@@ -389,7 +393,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @return QtiPoint A QtiPoint object.
      * @throws QtiBinaryStreamAccessException
      */
-    public function readPoint()
+    public function readPoint(): QtiPoint
     {
         try {
             return new QtiPoint($this->readShort(), $this->readShort());
@@ -405,7 +409,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @param QtiPoint $point A QtiPoint object.
      * @throws QtiBinaryStreamAccessException
      */
-    public function writePoint(QtiPoint $point)
+    public function writePoint(QtiPoint $point): void
     {
         try {
             $this->writeShort($point->getX());
@@ -422,7 +426,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @return QtiPair A QtiPair object.
      * @throws QtiBinaryStreamAccessException
      */
-    public function readPair()
+    public function readPair(): QtiPair
     {
         try {
             return new QtiPair($this->readString(), $this->readString());
@@ -438,7 +442,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @param QtiPair $pair A Pair object.
      * @throws QtiBinaryStreamAccessException
      */
-    public function writePair(QtiPair $pair)
+    public function writePair(QtiPair $pair): void
     {
         try {
             $this->writeString($pair->getFirst());
@@ -455,7 +459,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @return QtiDirectedPair A DirectedPair object.
      * @throws QtiBinaryStreamAccessException
      */
-    public function readDirectedPair()
+    public function readDirectedPair(): QtiDirectedPair
     {
         try {
             return new QtiDirectedPair($this->readString(), $this->readString());
@@ -471,7 +475,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @param QtiDirectedPair $directedPair A DirectedPair object.
      * @throws QtiBinaryStreamAccessException
      */
-    public function writeDirectedPair(QtiDirectedPair $directedPair)
+    public function writeDirectedPair(QtiDirectedPair $directedPair): void
     {
         try {
             $this->writeString($directedPair->getFirst());
@@ -488,7 +492,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @return ShufflingGroup
      * @throws QtiBinaryStreamAccessException
      */
-    public function readShufflingGroup()
+    public function readShufflingGroup(): ShufflingGroup
     {
         try {
             $identifiers = new IdentifierCollection();
@@ -522,7 +526,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @param ShufflingGroup $shufflingGroup
      * @throws QtiBinaryStreamAccessException
      */
-    public function writeShufflingGroup(ShufflingGroup $shufflingGroup)
+    public function writeShufflingGroup(ShufflingGroup $shufflingGroup): void
     {
         try {
             $identifiers = $shufflingGroup->getIdentifiers();
@@ -548,7 +552,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @return Shuffling
      * @throws QtiBinaryStreamAccessException
      */
-    public function readShufflingState()
+    public function readShufflingState(): Shuffling
     {
         try {
             $responseIdentifier = $this->readIdentifier();
@@ -573,7 +577,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @param Shuffling $shufflingState
      * @throws QtiBinaryStreamAccessException
      */
-    public function writeShufflingState(Shuffling $shufflingState)
+    public function writeShufflingState(Shuffling $shufflingState): void
     {
         try {
             $this->writeIdentifier($shufflingState->getResponseIdentifier());
@@ -595,7 +599,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @return QtiDuration A QtiDuration object.
      * @throws QtiBinaryStreamAccessException
      */
-    public function readDuration()
+    public function readDuration(): QtiDuration
     {
         try {
             return new QtiDuration($this->readString());
@@ -611,7 +615,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @param QtiDuration $duration A QtiDuration object.
      * @throws QtiBinaryStreamAccessException
      */
-    public function writeDuration(QtiDuration $duration)
+    public function writeDuration(QtiDuration $duration): void
     {
         try {
             $this->writeString($duration->__toString());
@@ -627,7 +631,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @return string A URI.
      * @throws QtiBinaryStreamAccessException
      */
-    public function readUri()
+    public function readUri(): string
     {
         try {
             return $this->readString();
@@ -643,7 +647,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @param string $uri A URI.
      * @throws QtiBinaryStreamAccessException
      */
-    public function writeUri($uri)
+    public function writeUri($uri): void
     {
         try {
             $this->writeString($uri);
@@ -677,7 +681,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @param int|string $intOrIdentifier An integer or a string value.
      * @throws QtiBinaryStreamAccessException
      */
-    public function writeIntOrIdentifier($intOrIdentifier)
+    public function writeIntOrIdentifier($intOrIdentifier): void
     {
         try {
             if (is_int($intOrIdentifier)) {
@@ -687,7 +691,10 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
                 $this->writeBoolean(false);
                 $this->writeString($intOrIdentifier);
             } else {
-                $msg = "The intOrIdentifier value to be written must be an integer or a string, '" . gettype($intOrIdentifier) . "' given.";
+                $msg = sprintf(
+                    'The intOrIdentifier value to be written must be an integer or a string, \'%s\' given.',
+                    gettype($intOrIdentifier)
+                );
                 throw new QtiBinaryStreamAccessException($msg, $this, QtiBinaryStreamAccessException::INTORIDENTIFIER);
             }
         } catch (BinaryStreamAccessException $e) {
@@ -700,7 +707,9 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * Read an AssessmentItemSession from the current binary stream.
      *
      * @param AbstractSessionManager $manager
-     * @param AssessmentTestSeeker $seeker An AssessmentTestSeeker object from where 'assessmentItemRef', 'outcomeDeclaration' and 'responseDeclaration' QTI components will be pulled out.
+     * @param AssessmentTestSeeker $seeker An AssessmentTestSeeker object from where 'assessmentItemRef',
+     *                                     'outcomeDeclaration' and 'responseDeclaration' QTI components
+     *                                     will be pulled out.
      * @param QtiBinaryVersion $version Version of the binary session storage
      * @return AssessmentItemSession
      * @throws QtiBinaryStreamAccessException
@@ -709,7 +718,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
         AbstractSessionManager $manager,
         AssessmentTestSeeker $seeker,
         QtiBinaryVersion $version
-    ) {
+    ): AssessmentItemSession {
         try {
             $itemRefPosition = $this->readShort();
             /** @var IAssessmentItem $assessmentItemRef */
@@ -761,7 +770,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
                     /** @var VariableDeclaration $variableDeclaration */
                     $variableDeclaration = $seeker->seekComponent($variableType, $varPosition);
                 } catch (OutOfBoundsException $e) {
-                    $msg = "No variable found at position ${varPosition} in the assessmentTest tree structure.";
+                    $msg = "No variable found at position {$varPosition} in the assessmentTest tree structure.";
                     throw new QtiBinaryStreamAccessException(
                         $msg,
                         $this,
@@ -780,7 +789,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
                 $hasCorrectResponse = $this->readBoolean();
 
                 // Read the intrinsic value of the variable.
-                $this->readVariableValue($variable, self::RW_VALUE);
+                $this->readVariableValue($variable);
 
                 if ($hasDefaultValue === true) {
                     $this->readVariableValue($variable, self::RW_DEFAULTVALUE);
@@ -788,6 +797,10 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
 
                 if ($hasCorrectResponse === true) {
                     $this->readVariableValue($variable, self::RW_CORRECTRESPONSE);
+                }
+
+                if ($version->storesVariableDefaultValueInitializationFlag() && $this->readBoolean()) {
+                    $variable->applyDefaultValue();
                 }
 
                 $session->setVariable($variable);
@@ -806,7 +819,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
             $msg = 'An error occurred while reading an assessment item session.';
             throw new QtiBinaryStreamAccessException($msg, $this, QtiBinaryStreamAccessException::ITEM_SESSION, $e);
         } catch (OutOfBoundsException $e) {
-            $msg = "No assessmentItemRef found at position ${itemRefPosition} in the assessmentTest tree structure.";
+            $msg = "No assessmentItemRef found at position {$itemRefPosition} in the assessmentTest tree structure.";
             throw new QtiBinaryStreamAccessException($msg, $this, QtiBinaryStreamAccessException::ITEM_SESSION, $e);
         }
     }
@@ -814,11 +827,12 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
     /**
      * Write an AssessmetnItemSession from the current binary stream.
      *
-     * @param AssessmentTestSeeker $seeker The AssessmentTestSeeker object from where the position of components will be pulled out.
+     * @param AssessmentTestSeeker $seeker The AssessmentTestSeeker object from where the position of components
+     *                                     will be pulled out.
      * @param AssessmentItemSession $session An AssessmentItemSession object.
      * @throws QtiBinaryStreamAccessException
      */
-    public function writeAssessmentItemSession(AssessmentTestSeeker $seeker, AssessmentItemSession $session)
+    public function writeAssessmentItemSession(AssessmentTestSeeker $seeker, AssessmentItemSession $session): void
     {
         try {
             $this->writeShort($seeker->seekPosition($session->getAssessmentItem()));
@@ -888,14 +902,17 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
                     $hasDefaultValue = !Utils::equals($variable->getDefaultValue(), $var->getDefaultValue());
                     $hasCorrectResponse = false;
 
-                    if ($varNature === 1 && !Utils::equals($variable->getCorrectResponse(), $var->getCorrectResponse())) {
+                    if (
+                        $varNature === 1
+                        && !Utils::equals($variable->getCorrectResponse(), $var->getCorrectResponse())
+                    ) {
                         $hasCorrectResponse = true;
                     }
 
                     $this->writeBoolean($hasDefaultValue);
                     $this->writeBoolean($hasCorrectResponse);
 
-                    $this->writeVariableValue($var, self::RW_VALUE);
+                    $this->writeVariableValue($var);
 
                     if ($hasDefaultValue === true) {
                         $this->writeVariableValue($var, self::RW_DEFAULTVALUE);
@@ -904,6 +921,8 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
                     if ($hasCorrectResponse === true) {
                         $this->writeVariableValue($var, self::RW_CORRECTRESPONSE);
                     }
+
+                    $this->writeBoolean($var->isInitializedFromDefaultValue());
                 }
             }
 
@@ -925,11 +944,12 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
     /**
      * Read a route item from the current binary stream.
      *
-     * @param AssessmentTestSeeker $seeker An AssessmentTestSeeker object where components will be pulled out by position.
+     * @param AssessmentTestSeeker $seeker An AssessmentTestSeeker object where components
+     *                                     will be pulled out by position.
      * @return RouteItem
      * @throws QtiBinaryStreamAccessException
      */
-    public function readRouteItem(AssessmentTestSeeker $seeker)
+    public function readRouteItem(AssessmentTestSeeker $seeker): RouteItem
     {
         try {
             $occurrence = $this->readTinyInt();
@@ -977,11 +997,12 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
     /**
      * Write a route item in the current binary stream.
      *
-     * @param AssessmentTestSeeker $seeker An AssessmentTestSeeker object in order to know tree position for involved QTI Components.
+     * @param AssessmentTestSeeker $seeker An AssessmentTestSeeker object in order to know tree position
+     *                                     for involved QTI Components.
      * @param RouteItem $routeItem A RouteItem object.
      * @throws QtiBinaryStreamAccessException
      */
-    public function writeRouteItem(AssessmentTestSeeker $seeker, RouteItem $routeItem)
+    public function writeRouteItem(AssessmentTestSeeker $seeker, RouteItem $routeItem): void
     {
         try {
             $this->writeTinyInt($routeItem->getOccurence());
@@ -1020,11 +1041,12 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
     /**
      * Read a PendingResponse object from the current binary stream.
      *
-     * @param AssessmentTestSeeker $seeker An AssessmentTestSeeker object in order to know tree position for involved QTI Components.
+     * @param AssessmentTestSeeker $seeker An AssessmentTestSeeker object in order to know tree position
+     *                                     for involved QTI Components.
      * @return PendingResponses A PendingResponses object.
      * @throws QtiBinaryStreamAccessException
      */
-    public function readPendingResponses(AssessmentTestSeeker $seeker)
+    public function readPendingResponses(AssessmentTestSeeker $seeker): PendingResponses
     {
         try {
             // Read the state.
@@ -1049,21 +1071,32 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
             return new PendingResponses($state, $itemRef, $occurrence);
         } catch (BinaryStreamAccessException $e) {
             $msg = 'An error occurred while reading some pending responses.';
-            throw new QtiBinaryStreamAccessException($msg, $this, QtiBinaryStreamAccessException::PENDING_RESPONSES, $e);
+            throw new QtiBinaryStreamAccessException(
+                $msg,
+                $this,
+                QtiBinaryStreamAccessException::PENDING_RESPONSES,
+                $e
+            );
         } catch (OutOfBoundsException $e) {
             $msg = 'A QTI component was not found in the assessmentTest tree structure.';
-            throw new QtiBinaryStreamAccessException($msg, $this, QtiBinaryStreamAccessException::PENDING_RESPONSES, $e);
+            throw new QtiBinaryStreamAccessException(
+                $msg,
+                $this,
+                QtiBinaryStreamAccessException::PENDING_RESPONSES,
+                $e
+            );
         }
     }
 
     /**
      * Write a PendingResponses object in the current binary stream.
      *
-     * @param AssessmentTestSeeker $seeker An AssessmentTestSeeker object from where positions in the assessmentTest tree will be pulled out.
+     * @param AssessmentTestSeeker $seeker An AssessmentTestSeeker object from where positions
+     *                                     in the assessmentTest tree will be pulled out.
      * @param PendingResponses $pendingResponses The read PendingResponses object.
      * @throws QtiBinaryStreamAccessException
      */
-    public function writePendingResponses(AssessmentTestSeeker $seeker, PendingResponses $pendingResponses)
+    public function writePendingResponses(AssessmentTestSeeker $seeker, PendingResponses $pendingResponses): void
     {
         try {
             $state = $pendingResponses->getState();
@@ -1081,8 +1114,12 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
                     $this->writeShort($seeker->seekPosition($responseDeclarations[$respId]));
                     $this->writeVariableValue($responseVariable);
                 } else {
-                    $msg = "No response variable with identifier '${respId}' found in related assessmentItemRef.";
-                    throw new QtiBinaryStreamAccessException($msg, $this, QtiBinaryStreamAccessException::PENDING_RESPONSES);
+                    $msg = "No response variable with identifier '{$respId}' found in related assessmentItemRef.";
+                    throw new QtiBinaryStreamAccessException(
+                        $msg,
+                        $this,
+                        QtiBinaryStreamAccessException::PENDING_RESPONSES
+                    );
                 }
             }
 
@@ -1093,10 +1130,20 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
             $this->writeTinyInt($occurrence);
         } catch (BinaryStreamAccessException $e) {
             $msg = 'An error occurred while reading some pending responses.';
-            throw new QtiBinaryStreamAccessException($msg, $this, QtiBinaryStreamAccessException::PENDING_RESPONSES, $e);
+            throw new QtiBinaryStreamAccessException(
+                $msg,
+                $this,
+                QtiBinaryStreamAccessException::PENDING_RESPONSES,
+                $e
+            );
         } catch (OutOfBoundsException $e) {
             $msg = 'A QTI component position could not be found in the assessmentTest tree structure.';
-            throw new QtiBinaryStreamAccessException($msg, $this, QtiBinaryStreamAccessException::PENDING_RESPONSES, $e);
+            throw new QtiBinaryStreamAccessException(
+                $msg,
+                $this,
+                QtiBinaryStreamAccessException::PENDING_RESPONSES,
+                $e
+            );
         }
     }
 
@@ -1107,11 +1154,11 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @throws BinaryStreamAccessException
      * @throws QtiBinaryStreamAccessException
      */
-    public function writeFile(QtiFile $file)
+    public function writeFile(QtiFile $file): void
     {
         $toPersist = $file instanceof FileHash
             ? json_encode($file)
-            : $file->getIdentifier();
+            : sprintf(self::FILE_IDENTIFIER_ENCODING_MASK, $file->getIdentifier(), $file->getFilename());
 
         try {
             $this->writeString($toPersist);
@@ -1128,7 +1175,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @throws QtiBinaryStreamAccessException
      * @throws FileManagerException
      */
-    public function readFile()
+    public function readFile(): QtiFile
     {
         try {
             $id = $this->readString();
@@ -1142,7 +1189,9 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
             return FileHash::createFromArray($decoded);
         }
 
-        return $this->getFileManager()->retrieve($id);
+        [$id, $filename] = sscanf($id, self::FILE_IDENTIFIER_ENCODING_MASK);
+
+        return $this->getFileManager()->retrieve($id, $filename);
     }
 
     /**
@@ -1151,7 +1200,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @return array An array of integer values representing flow positions.
      * @throws QtiBinaryStreamAccessException
      */
-    public function readPath()
+    public function readPath(): array
     {
         try {
             $pathCount = $this->readShort();
@@ -1174,7 +1223,7 @@ class QtiBinaryStreamAccess extends BinaryStreamAccess
      * @param array $path An array of integer values representing flow positions.
      * @throws QtiBinaryStreamAccessException
      */
-    public function writePath(array $path)
+    public function writePath(array $path): void
     {
         try {
             $this->writeShort(count($path));

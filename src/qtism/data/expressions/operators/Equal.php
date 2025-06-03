@@ -76,7 +76,7 @@ class Equal extends Operator
     /**
      * From IMS QTI:
      *
-     * Controls whether or not the lower bound is included in the comparison.
+     * Controls whether the lower bound is included in the comparison.
      *
      * @var bool
      * @qtism-bean-property
@@ -97,8 +97,8 @@ class Equal extends Operator
      * @param ExpressionCollection $expressions A collection of Expression objects.
      * @param int $toleranceMode The tolerance mode, a value from the ToleranceMode enumeration.
      * @param array $tolerance An array of 1 or 2 elements which are float or variableRef values.
-     * @param bool $includeLowerBound Whether or not to include the lower bound in the comparison.
-     * @param bool $includeUpperBound Whether or not to include the upper bound in the comparison.
+     * @param bool $includeLowerBound Whether to include the lower bound in the comparison.
+     * @param bool $includeUpperBound Whether to include the upper bound in the comparison.
      * @throws UnexpectedValueException If The tolerance argument is ABSOLUTE or RELATIVE but no $tolerance array is given.
      * @throws InvalidArgumentException If $toleranceMode is not a value from the ToleranceMode, if $tolerance is not a valid tolerance array, if $includeLowerBound/$includeUpperBound is not a boolean.
      */
@@ -123,7 +123,7 @@ class Equal extends Operator
      * @param int $toleranceMode A value from the ToleranceMode enumeration.
      * @throws InvalidArgumentException If $toleranceMode is not a value from the ToleranceMode enumeration.
      */
-    public function setToleranceMode($toleranceMode)
+    public function setToleranceMode($toleranceMode): void
     {
         if (in_array($toleranceMode, ToleranceMode::asArray(), true)) {
             $this->toleranceMode = $toleranceMode;
@@ -138,7 +138,7 @@ class Equal extends Operator
      *
      * @return int A value from the ToleranceMode enumeration.
      */
-    public function getToleranceMode()
+    public function getToleranceMode(): int
     {
         return $this->toleranceMode;
     }
@@ -151,7 +151,7 @@ class Equal extends Operator
      * @param array $tolerance An array of float|variableRef.
      * @throws InvalidArgumentException If the $tolerance count is less than 1 or greather than 2.
      */
-    public function setTolerance(array $tolerance)
+    public function setTolerance(array $tolerance): void
     {
         if (($this->getToleranceMode() == ToleranceMode::ABSOLUTE || $this->getToleranceMode() == ToleranceMode::RELATIVE) && count($tolerance) < 1) {
             $msg = 'The tolerance array must contain at least t0.';
@@ -171,7 +171,7 @@ class Equal extends Operator
      *
      * @return array An array of float|variableRef.
      */
-    public function getTolerance()
+    public function getTolerance(): array
     {
         return $this->tolerance;
     }
@@ -182,7 +182,7 @@ class Equal extends Operator
      * @param bool $includeLowerBound
      * @throws InvalidArgumentException If $includedLowerBound is not a boolean value.
      */
-    public function setIncludeLowerBound($includeLowerBound)
+    public function setIncludeLowerBound($includeLowerBound): void
     {
         if (is_bool($includeLowerBound)) {
             $this->includeLowerBound = $includeLowerBound;
@@ -197,7 +197,7 @@ class Equal extends Operator
      *
      * @return bool
      */
-    public function doesIncludeLowerBound()
+    public function doesIncludeLowerBound(): bool
     {
         return $this->includeLowerBound;
     }
@@ -208,7 +208,7 @@ class Equal extends Operator
      * @param bool $includeUpperBound
      * @throws InvalidArgumentException If $includeUpperBound is not a boolean.
      */
-    public function setIncludeUpperBound($includeUpperBound)
+    public function setIncludeUpperBound($includeUpperBound): void
     {
         if (is_bool($includeUpperBound)) {
             $this->includeUpperBound = $includeUpperBound;
@@ -223,7 +223,7 @@ class Equal extends Operator
      *
      * @return bool
      */
-    public function doesIncludeUpperBound()
+    public function doesIncludeUpperBound(): bool
     {
         return $this->includeUpperBound;
     }
@@ -231,7 +231,7 @@ class Equal extends Operator
     /**
      * @return string
      */
-    public function getQtiClassName()
+    public function getQtiClassName(): string
     {
         return 'equal';
     }

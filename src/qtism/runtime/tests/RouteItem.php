@@ -121,7 +121,7 @@ class RouteItem
      *
      * @param AssessmentTest $assessmentTest An AssessmentTest object.
      */
-    public function setAssessmentTest(AssessmentTest $assessmentTest)
+    public function setAssessmentTest(AssessmentTest $assessmentTest): void
     {
         $this->assessmentTest = $assessmentTest;
     }
@@ -131,7 +131,7 @@ class RouteItem
      *
      * @return AssessmentTest An AssessmentTest object.
      */
-    public function getAssessmentTest()
+    public function getAssessmentTest(): AssessmentTest
     {
         return $this->assessmentTest;
     }
@@ -141,7 +141,7 @@ class RouteItem
      *
      * @param AssessmentItemRef $assessmentItemRef An AssessmentItemRef object.
      */
-    public function setAssessmentItemRef(AssessmentItemRef $assessmentItemRef)
+    public function setAssessmentItemRef(AssessmentItemRef $assessmentItemRef): void
     {
         $this->assessmentItemRef = $assessmentItemRef;
     }
@@ -151,7 +151,7 @@ class RouteItem
      *
      * @return AssessmentItemRef An AssessmentItemRef object.
      */
-    public function getAssessmentItemRef()
+    public function getAssessmentItemRef(): AssessmentItemRef
     {
         return $this->assessmentItemRef;
     }
@@ -161,7 +161,7 @@ class RouteItem
      *
      * @param TestPart $testPart A TestPart object.
      */
-    public function setTestPart(TestPart $testPart)
+    public function setTestPart(TestPart $testPart): void
     {
         $this->testPart = $testPart;
     }
@@ -171,7 +171,7 @@ class RouteItem
      *
      * @return TestPart A TestPart object.
      */
-    public function getTestPart()
+    public function getTestPart(): TestPart
     {
         return $this->testPart;
     }
@@ -181,7 +181,7 @@ class RouteItem
      *
      * @param AssessmentSection $assessmentSection An AssessmentSection object.
      */
-    public function setAssessmentSection(AssessmentSection $assessmentSection)
+    public function setAssessmentSection(AssessmentSection $assessmentSection): void
     {
         $this->assessmentSections = new AssessmentSectionCollection([$assessmentSection]);
     }
@@ -191,7 +191,7 @@ class RouteItem
      *
      * @param AssessmentSectionCollection $assessmentSections A collection of AssessmentSection objects.
      */
-    public function setAssessmentSections(AssessmentSectionCollection $assessmentSections)
+    public function setAssessmentSections(AssessmentSectionCollection $assessmentSections): void
     {
         $this->assessmentSections = $assessmentSections;
     }
@@ -201,7 +201,7 @@ class RouteItem
      *
      * @param int $occurence An occurence number.
      */
-    public function setOccurence($occurence)
+    public function setOccurence($occurence): void
     {
         $this->occurence = $occurence;
     }
@@ -211,7 +211,7 @@ class RouteItem
      *
      * @return int An occurence number.
      */
-    public function getOccurence()
+    public function getOccurence(): int
     {
         return $this->occurence;
     }
@@ -221,7 +221,7 @@ class RouteItem
      *
      * @return BranchRuleCollection A collection of BranchRule objects.
      */
-    public function getBranchRules()
+    public function getBranchRules(): BranchRuleCollection
     {
         return $this->branchRules;
     }
@@ -231,7 +231,7 @@ class RouteItem
      *
      * @param BranchRuleCollection $branchRules A collection of BranchRule objects.
      */
-    public function setBranchRules(BranchRuleCollection $branchRules)
+    public function setBranchRules(BranchRuleCollection $branchRules): void
     {
         $this->branchRules = $branchRules;
     }
@@ -241,7 +241,7 @@ class RouteItem
      *
      * @param BranchRule $branchRule A BranchRule object to be added.
      */
-    public function addBranchRule(BranchRule $branchRule)
+    public function addBranchRule(BranchRule $branchRule): void
     {
         $this->branchRules->attach($branchRule);
     }
@@ -251,7 +251,7 @@ class RouteItem
      *
      * @param BranchRuleCollection $branchRules A collection of BranchRule object.
      */
-    public function addBranchRules(BranchRuleCollection $branchRules)
+    public function addBranchRules(BranchRuleCollection $branchRules): void
     {
         foreach ($branchRules as $branchRule) {
             $this->addBranchRule($branchRule);
@@ -263,9 +263,33 @@ class RouteItem
      *
      * @return PreConditionCollection A collection of PreCondition objects.
      */
-    public function getPreConditions()
+    public function getPreConditions(): PreConditionCollection
     {
         return $this->preConditions;
+    }
+
+    /**
+     * Get the PreConditions that actually need to be applied considering all the parent elements: TestPart and Section
+     *
+     * @return PreConditionCollection A collection of PreCondition objects.
+     */
+    public function getEffectivePreConditions(): PreConditionCollection
+    {
+        $routeItemPreConditions = new PreConditionCollection([]);
+
+        foreach ($this->getTestPart()->getPreConditions() as $preCondition) {
+            $routeItemPreConditions->attach($preCondition);
+        }
+
+        foreach ($this->getAssessmentSection()->getPreConditions() as $preCondition) {
+            $routeItemPreConditions->attach($preCondition);
+        }
+
+        foreach ($this->getPreConditions() as $preCondition) {
+            $routeItemPreConditions->attach($preCondition);
+        }
+
+        return $routeItemPreConditions;
     }
 
     /**
@@ -273,7 +297,7 @@ class RouteItem
      *
      * @param PreConditionCollection $preConditions A collection of PreCondition objects.
      */
-    public function setPreConditions(PreConditionCollection $preConditions)
+    public function setPreConditions(PreConditionCollection $preConditions): void
     {
         $this->preConditions = $preConditions;
     }
@@ -283,7 +307,7 @@ class RouteItem
      *
      * @param PreCondition $preCondition A PreCondition object to be added.
      */
-    public function addPreCondition(PreCondition $preCondition)
+    public function addPreCondition(PreCondition $preCondition): void
     {
         $this->preConditions->attach($preCondition);
     }
@@ -293,7 +317,7 @@ class RouteItem
      *
      * @param PreConditionCollection $preConditions A collection of PreCondition object.
      */
-    public function addPreConditions(PreConditionCollection $preConditions)
+    public function addPreConditions(PreConditionCollection $preConditions): void
     {
         foreach ($preConditions as $preCondition) {
             $this->addPreCondition($preCondition);
@@ -303,7 +327,7 @@ class RouteItem
     /**
      * Increment the occurence number by 1.
      */
-    public function incrementOccurenceNumber()
+    public function incrementOccurenceNumber(): void
     {
         $this->setOccurence($this->getOccurence() + 1);
     }
@@ -315,7 +339,7 @@ class RouteItem
      *
      * @return AssessmentSection An AssessmentSection object.
      */
-    public function getAssessmentSection()
+    public function getAssessmentSection(): AssessmentSection
     {
         $assessmentSections = $this->getAssessmentSections()->getArrayCopy();
 
@@ -327,7 +351,7 @@ class RouteItem
      *
      * @return AssessmentSectionCollection An AssessmentSectionCollection object.
      */
-    public function getAssessmentSections()
+    public function getAssessmentSections(): AssessmentSectionCollection
     {
         return $this->assessmentSections;
     }
@@ -337,7 +361,7 @@ class RouteItem
      *
      * @return RouteItemSessionControl|null The ItemSessionControl in force or null if the RouteItem is not under ItemSessionControl.
      */
-    public function getItemSessionControl()
+    public function getItemSessionControl(): ?RouteItemSessionControl
     {
         if (($isc = $this->getAssessmentItemRef()->getItemSessionControl()) !== null) {
             return RouteItemSessionControl::createFromItemSessionControl($isc, $this->getAssessmentItemRef());
@@ -367,7 +391,7 @@ class RouteItem
      *
      * @return RubricBlockCollection A collection of RubricBlock objects.
      */
-    public function getRubricBlocks()
+    public function getRubricBlocks(): RubricBlockCollection
     {
         $rubrics = new RubricBlockCollection();
 
@@ -385,7 +409,7 @@ class RouteItem
      *
      * @return RubricBlockRefCollection A collection of RubricBlockRef objects.
      */
-    public function getRubricBlockRefs()
+    public function getRubricBlockRefs(): RubricBlockRefCollection
     {
         $rubrics = new RubricBlockRefCollection();
 
@@ -399,10 +423,10 @@ class RouteItem
     /**
      * Get the TimeLimits in force for the RouteItem.
      *
-     * @param bool $excludeItem Whether or not include the TimeLimits in force for the assessment item of the RouteItem.
+     * @param bool $excludeItem Whether include the TimeLimits in force for the assessment item of the RouteItem.
      * @return RouteTimeLimitsCollection
      */
-    public function getTimeLimits($excludeItem = false)
+    public function getTimeLimits($excludeItem = false): RouteTimeLimitsCollection
     {
         $timeLimits = new RouteTimeLimitsCollection();
 
@@ -425,5 +449,38 @@ class RouteItem
         }
 
         return $timeLimits;
+    }
+
+    public function getEffectiveBranchRules(): BranchRuleCollection
+    {
+        // Checking branching rules at the Item level
+        if (!$this->getBranchRules()->isEmpty()) {
+            return $this->getBranchRules();
+        }
+
+        if (!$this->getAssessmentItemRef()->isLast()) {
+            return new BranchRuleCollection();
+        }
+
+        $parentSection = $this->getAssessmentSection();
+
+        // Checking branching rules at the Section/Subsection level
+        // To get branching rules for the current section, you need to make sure that the current part of the
+        // section is the last part of the current section.
+        do {
+            if (!$parentSection->getBranchRules()->isEmpty()) {
+                return $parentSection->getBranchRules();
+            }
+
+            if (!$parentSection->isLast()) {
+                return new BranchRuleCollection();
+            }
+        } while ($parentSection = $parentSection->getParent());
+
+        // Return branching rules from the Test Part level
+        $branchingRules = $this->getTestPart()->getBranchRules();
+        $branchingRules->allowNonLinearNavigationMode();
+
+        return $branchingRules;
     }
 }

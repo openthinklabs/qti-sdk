@@ -46,14 +46,14 @@ class Exception
      * @param true $withClassName Whether to show the Exception class name.
      * @return string
      */
-    public static function formatMessage(\Exception $e, $withClassName = true)
+    public static function formatMessage(\Exception $e, $withClassName = true): string
     {
         $returnValue = '';
 
         do {
             $className = get_class($e);
             $message = $e->getMessage();
-            $returnValue .= ($withClassName === true) ? "[${className}] ${message}" : $message;
+            $returnValue .= ($withClassName === true) ? "[{$className}] {$message}" : $message;
 
             if ($e = $e->getPrevious()) {
                 $returnValue .= "\nCaused by:\n";

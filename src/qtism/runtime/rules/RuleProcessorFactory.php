@@ -49,7 +49,7 @@ class RuleProcessorFactory implements ProcessorFactory
      * @return Processable The related RuleProcessor object.
      * @throws RuntimeException If no RuleProcessor can be found for the given $rule.
      */
-    public function createProcessor(QtiComponent $rule)
+    public function createProcessor(QtiComponent $rule): Processable
     {
         $qtiClassName = ucfirst($rule->getQtiClassName());
         $nsPackage = 'qtism\\runtime\\rules\\';
@@ -59,7 +59,7 @@ class RuleProcessorFactory implements ProcessorFactory
             return new $className($rule);
         }
 
-        $msg = "The QTI rule class '${qtiClassName}' has no dedicated RuleProcessor class.";
+        $msg = "The QTI rule class '{$qtiClassName}' has no dedicated RuleProcessor class.";
         throw new RuntimeException($msg);
     }
 }

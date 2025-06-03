@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2022 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  * @author Jérôme Bogaerts <jerome@taotesting.com>
  * @license GPLv2
@@ -49,7 +49,7 @@ class FileSystemFileManager implements FileManager
      *
      * @param string $storageDirectory A canonical path.
      */
-    protected function setStorageDirectory($storageDirectory)
+    protected function setStorageDirectory($storageDirectory): void
     {
         $this->storageDirectory = $storageDirectory;
     }
@@ -60,7 +60,7 @@ class FileSystemFileManager implements FileManager
      *
      * @return string A canonical path.
      */
-    protected function getStorageDirectory()
+    protected function getStorageDirectory(): string
     {
         return $this->storageDirectory;
     }
@@ -75,7 +75,7 @@ class FileSystemFileManager implements FileManager
      * @return FileSystemFile
      * @throws FileManagerException
      */
-    public function createFromFile($path, $mimeType, $filename = '')
+    public function createFromFile($path, $mimeType, $filename = ''): FileSystemFile
     {
         $destination = $this->buildDestination();
 
@@ -93,12 +93,13 @@ class FileSystemFileManager implements FileManager
      * @param string $data The binary data of the FileSystemFile object to be created.
      * @param string $mimeType A mime-type.
      * @param string $filename A file name e.g. "myfile.txt".
+     * @param string|null $path A path for file provided externally
      * @return FileSystemFile
      * @throws FileManagerException
      */
-    public function createFromData($data, $mimeType, $filename = '')
+    public function createFromData($data, $mimeType, $filename = '', $path = null): FileSystemFile
     {
-        $destination = $this->buildDestination();
+        $destination = $path ?: $this->buildDestination();
 
         try {
             return FileSystemFile::createFromData($data, $destination, $mimeType, $filename);
@@ -111,11 +112,12 @@ class FileSystemFileManager implements FileManager
     /**
      * Retrieve a FileSystemFile object from its unique identifier.
      *
-     * @param string identifier
+     * @param string $identifier
+     * @param string|null $filename
      * @return FileSystemFile
      * @throws FileManagerException
      */
-    public function retrieve($identifier)
+    public function retrieve($identifier, $filename = null): FileSystemFile
     {
         try {
             return FileSystemFile::retrieveFile($identifier);
@@ -131,7 +133,7 @@ class FileSystemFileManager implements FileManager
      * @param QtiFile $file
      * @throws FileManagerException
      */
-    public function delete(QtiFile $file)
+    public function delete(QtiFile $file): void
     {
         $deletion = @unlink($file->getPath());
         if ($deletion === false) {
@@ -145,7 +147,7 @@ class FileSystemFileManager implements FileManager
      *
      * @return string
      */
-    protected function buildDestination()
+    protected function buildDestination(): string
     {
         return rtrim($this->getStorageDirectory(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . uniqid('qtism', true);
     }

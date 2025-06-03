@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2013-2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2013-2024 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  * @author Jérôme Bogaerts <jerome@taotesting.com>
  * @license GPLv2
@@ -25,13 +25,12 @@ namespace qtism\runtime\common;
 
 use InvalidArgumentException;
 use qtism\common\datatypes\QtiDatatype;
-use qtism\common\datatypes\QtiFile;
+use qtism\common\datatypes\QtiScalar;
 use qtism\common\enums\BaseType;
 use qtism\common\enums\Cardinality;
 use qtism\data\state\Value;
 use qtism\data\state\ValueCollection;
 use qtism\data\state\VariableDeclaration;
-use qtism\data\storage\Utils as StorageUtils;
 use qtism\runtime\common\Utils as RuntimeUtils;
 use UnexpectedValueException;
 
@@ -40,6 +39,9 @@ use UnexpectedValueException;
  */
 abstract class Variable
 {
+    /** Whether the variable value has been defined or only initialized from the default one */
+    protected bool $isInitializedFromDefaultValue = false;
+
     /**
      * The identifier of the variable.
      *
@@ -106,7 +108,7 @@ abstract class Variable
      * * If the variable is supposed to contain a Container (Multiple, Ordered or Record cardinality), the variable's value becomes an empty container.
      * * If the variable is scalar (Cardinality single), the value becomes NULL.
      */
-    public function initialize()
+    public function initialize(): void
     {
         if ($this->cardinality === Cardinality::MULTIPLE) {
             $value = new MultipleContainer($this->baseType);
@@ -126,7 +128,7 @@ abstract class Variable
      *
      * @return string An identifier.
      */
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return $this->identifier;
     }
@@ -136,7 +138,7 @@ abstract class Variable
      *
      * @param string $identifier An identifier.
      */
-    public function setIdentifier($identifier)
+    public function setIdentifier($identifier): void
     {
         $this->identifier = $identifier;
     }
@@ -146,7 +148,7 @@ abstract class Variable
      *
      * @return int A value from the Cardinality enumeration.
      */
-    public function getCardinality()
+    public function getCardinality(): int
     {
         return $this->cardinality;
     }
@@ -156,7 +158,7 @@ abstract class Variable
      *
      * @param int $cardinality A value from the Cardinality enumeration.
      */
-    public function setCardinality($cardinality)
+    public function setCardinality($cardinality): void
     {
         $this->cardinality = $cardinality;
     }
@@ -166,7 +168,7 @@ abstract class Variable
      *
      * @return int A value from the BaseType enumeration.
      */
-    public function getBaseType()
+    public function getBaseType(): int
     {
         return $this->baseType;
     }
@@ -177,7 +179,7 @@ abstract class Variable
      * @param int $baseType A value from the Cardinality enumeration or -1 if there is no baseType in a Cardinality::RECORD context.
      * @throws InvalidArgumentException If -1 is passed but Cardinality::RECORD is not set.
      */
-    public function setBaseType($baseType)
+    public function setBaseType($baseType): void
     {
         if ($baseType === -1 && $this->isRecord() === false) {
             $msg = 'You are forced to specify a baseType if cardinality is not RECORD.';
@@ -192,7 +194,7 @@ abstract class Variable
      *
      * @return QtiDatatype A QtiDatatype object or null.
      */
-    public function getValue()
+    public function getValue(): ?QtiDatatype
     {
         return $this->value;
     }
@@ -203,13 +205,17 @@ abstract class Variable
      * @param QtiDatatype|null $value A QtiDatatype object or null.
      * @throws InvalidArgumentException If the baseType and cardinality of $value are not compliant with the Variable.
      */
-    public function setValue(QtiDatatype $value = null)
+    public function setValue(QtiDatatype $value = null): void
     {
-        if (!Utils::isBaseTypeCompliant($this->getBaseType(), $value) || !Utils::isCardinalityCompliant($this->getCardinality(), $value)) {
+        if (
+            !Utils::isBaseTypeCompliant($this->getBaseType(), $value)
+            || !Utils::isCardinalityCompliant($this->getCardinality(), $value)
+        ) {
             Utils::throwBaseTypeTypingError($this->baseType, $value);
-        } else {
-            $this->value = $value;
         }
+
+        $this->value = $value;
+        $this->isInitializedFromDefaultValue = false;
     }
 
     /**
@@ -217,7 +223,7 @@ abstract class Variable
      *
      * @return QtiDatatype|null A QtiDatatype object or null.
      */
-    public function getDefaultValue()
+    public function getDefaultValue(): ?QtiDatatype
     {
         return $this->defaultValue;
     }
@@ -229,7 +235,7 @@ abstract class Variable
      * @throws InvalidArgumentException If $defaultValue's type is not
      * compliant with the qti:baseType of the Variable.
      */
-    public function setDefaultValue(QtiDatatype $defaultValue = null)
+    public function setDefaultValue(QtiDatatype $defaultValue = null): void
     {
         if (!Utils::isBaseTypeCompliant($this->getBaseType(), $defaultValue) || !Utils::isCardinalityCompliant($this->getCardinality(), $defaultValue)) {
             Utils::throwBaseTypeTypingError($this->getBaseType(), $defaultValue);
@@ -245,7 +251,7 @@ abstract class Variable
      * @return Variable A Variable object.
      * @throws UnexpectedValueException If $variableDeclaration is not consistent.
      */
-    public static function createFromDataModel(VariableDeclaration $variableDeclaration)
+    public static function createFromDataModel(VariableDeclaration $variableDeclaration): self
     {
         $identifier = $variableDeclaration->getIdentifier();
         $baseType = $variableDeclaration->getBaseType();
@@ -274,6 +280,7 @@ abstract class Variable
      * @return mixed The resulting QTI Runtime value (primitive or container depending on baseType/cardinality).
      * @throws UnexpectedValueException If $baseType or/and $cardinality are not respected by the Value objects in the ValueCollection.
      */
+    #[\ReturnTypeWillChange]
     protected static function dataModelValuesToRuntime(ValueCollection $valueCollection, $baseType, $cardinality)
     {
         // Cardinality?
@@ -313,6 +320,11 @@ abstract class Variable
         }
     }
 
+    public function isInitializedFromDefaultValue(): bool
+    {
+        return $this->isInitializedFromDefaultValue;
+    }
+
     /**
      * Has Single Cardinality.
      *
@@ -320,7 +332,7 @@ abstract class Variable
      *
      * @return bool
      */
-    public function isSingle()
+    public function isSingle(): bool
     {
         return $this->cardinality === Cardinality::SINGLE;
     }
@@ -332,7 +344,7 @@ abstract class Variable
      *
      * @return bool Returns true in case of the cardinality is Multiple or Ordered. Otherwise the method returns false.
      */
-    public function isMultiple()
+    public function isMultiple(): bool
     {
         return $this->cardinality === Cardinality::MULTIPLE || $this->cardinality === Cardinality::ORDERED;
     }
@@ -344,7 +356,7 @@ abstract class Variable
      *
      * @return bool
      */
-    public function isOrdered()
+    public function isOrdered(): bool
     {
         return $this->cardinality === Cardinality::ORDERED;
     }
@@ -356,7 +368,7 @@ abstract class Variable
      *
      * @return bool
      */
-    public function isRecord()
+    public function isRecord(): bool
     {
         return $this->cardinality === Cardinality::RECORD;
     }
@@ -369,7 +381,7 @@ abstract class Variable
      *
      * @return bool
      */
-    public function isNumeric()
+    public function isNumeric(): bool
     {
         return ($this->IsNull()) ? false : ($this->baseType === BaseType::INTEGER || $this->baseType === BaseType::FLOAT);
     }
@@ -386,7 +398,7 @@ abstract class Variable
      *
      * @return bool
      */
-    public function isNull()
+    public function isNull(): bool
     {
         $value = $this->getValue();
         // Containers as per QTI Spec, are considered to be NULL if empty.
@@ -407,7 +419,7 @@ abstract class Variable
      *
      * @return bool
      */
-    public function isBool()
+    public function isBool(): bool
     {
         return (!$this->isNull() && $this->getBaseType() === BaseType::BOOLEAN);
     }
@@ -420,7 +432,7 @@ abstract class Variable
      *
      * @return bool
      */
-    public function isInteger()
+    public function isInteger(): bool
     {
         return (!$this->isNull() && $this->getBaseType() === BaseType::INTEGER);
     }
@@ -433,7 +445,7 @@ abstract class Variable
      *
      * @return boolean
      */
-    public function isFile()
+    public function isFile(): bool
     {
         return (!$this->isNull() && $this->getBaseType() === BaseType::FILE);
     }
@@ -446,7 +458,7 @@ abstract class Variable
      *
      * @return bool
      */
-    public function isFloat()
+    public function isFloat(): bool
     {
         return (!$this->isNull() && $this->getBaseType() === BaseType::FLOAT);
     }
@@ -459,7 +471,7 @@ abstract class Variable
      *
      * @return bool
      */
-    public function isPoint()
+    public function isPoint(): bool
     {
         return (!$this->isNull() && $this->getBaseType() === BaseType::POINT);
     }
@@ -474,7 +486,7 @@ abstract class Variable
      *
      * @return bool
      */
-    public function isPair()
+    public function isPair(): bool
     {
         return (!$this->isNull()
             && ($this->getBaseType() === BaseType::PAIR
@@ -491,7 +503,7 @@ abstract class Variable
      *
      * @return bool
      */
-    public function isDirectedPair()
+    public function isDirectedPair(): bool
     {
         return (!$this->isNull() && $this->getBaseType() === BaseType::DIRECTED_PAIR);
     }
@@ -504,7 +516,7 @@ abstract class Variable
      *
      * @return bool
      */
-    public function isDuration()
+    public function isDuration(): bool
     {
         return (!$this->isNull() && $this->getBaseType() === BaseType::DURATION);
     }
@@ -517,7 +529,7 @@ abstract class Variable
      *
      * @return bool
      */
-    public function isString()
+    public function isString(): bool
     {
         return (!$this->isNull() && $this->getBaseType() === BaseType::STRING);
     }
@@ -529,7 +541,7 @@ abstract class Variable
      *
      * @return ValueCollection
      */
-    public function getDataModelValues()
+    public function getDataModelValues(): ValueCollection
     {
         if ($this->getValue() === null) {
             return new ValueCollection();
@@ -551,10 +563,10 @@ abstract class Variable
                 break;
 
             case Cardinality::RECORD:
-                foreach ($this->getValue() as $v) {
+                foreach ($this->getValue() as $k => $v) {
                     $values[] = $v === null
-                        ? $this->createRecordNullValue()
-                        : $this->createRecordValue($v);
+                        ? $this->createRecordNullValue($k)
+                        : $this->createRecordValue($v, $k);
                 }
                 break;
         }
@@ -564,41 +576,30 @@ abstract class Variable
 
     /**
      * @param QtiDatatype $value
-     * @param int|null $baseType
      * @return Value
      */
-    private function createValue(QtiDatatype $value, int $baseType = null): Value
+    private function createValue(QtiDatatype $value): Value
     {
-        if (!$value instanceof QtiFile || !$this->isFile()) {
-            $value = StorageUtils::stringToDatatype(
-                (string)$value,
-                $baseType ?? $this->getBaseType()
-            );
-        }
-
-        return new Value($value);
+        return new Value($value instanceof QtiScalar ? $value->getValue() : $value);
     }
 
-    /**
-     * @param QtiDatatype $value
-     * @return Value
-     */
-    private function createRecordValue(QtiDatatype $value): Value
+    private function createRecordValue(QtiDatatype $qtiValue, string $fieldIdentifier): Value
     {
-        $value = $this->createValue($value, $value->getBaseType());
+        $value = $this->createValue($qtiValue);
         $value->setPartOfRecord(true);
+        $value->setFieldIdentifier($fieldIdentifier);
+        $value->setBaseType($qtiValue->getBaseType());
         return $value;
     }
 
     /**
      * Creates a null value to fill a gap in a record set.
-     *
-     * @return Value
      */
-    private function createRecordNullValue(): Value
+    private function createRecordNullValue(string $fieldIdentifier): Value
     {
         $value = new Value(null);
         $value->setPartOfRecord(true);
+        $value->setFieldIdentifier($fieldIdentifier);
         return $value;
     }
 
@@ -606,9 +607,10 @@ abstract class Variable
      * Set the value of the Variable with its default value. If no default
      * value was given, the value of the variable becomes NULL.
      */
-    public function applyDefaultValue()
+    public function applyDefaultValue(): void
     {
         $this->setValue($this->getDefaultValue());
+        $this->isInitializedFromDefaultValue = true;
     }
 
     /**

@@ -37,10 +37,10 @@ class ViewCollection extends IntegerCollection
      * @param mixed $value
      * @throws InvalidArgumentException If $value is not a valid View enumeration value.
      */
-    protected function checkType($value)
+    protected function checkType($value): void
     {
         if (!in_array($value, View::asArray())) {
-            $msg = "The ViewsCollection class only accept View enumeration values, '${value}' given.";
+            $msg = "The ViewsCollection class only accept View enumeration values, '{$value}' given.";
             throw new InvalidArgumentException($msg);
         }
     }

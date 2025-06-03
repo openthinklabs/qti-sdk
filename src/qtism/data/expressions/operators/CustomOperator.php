@@ -99,7 +99,7 @@ class CustomOperator extends Operator implements IExternal
      * @param string $class A class name which is tool specific.
      * @throws InvalidArgumentException If $class is not a string.
      */
-    public function setClass($class)
+    public function setClass($class): void
     {
         if (is_string($class)) {
             $this->class = $class;
@@ -114,17 +114,17 @@ class CustomOperator extends Operator implements IExternal
      *
      * @return string A class name which is tool specific.
      */
-    public function getClass()
+    public function getClass(): string
     {
         return $this->class;
     }
 
     /**
-     * Whether or not a value is defined for the class attribute.
+     * Whether a value is defined for the class attribute.
      *
      * @return bool
      */
-    public function hasClass()
+    public function hasClass(): bool
     {
         return $this->getClass() !== '';
     }
@@ -136,7 +136,7 @@ class CustomOperator extends Operator implements IExternal
      * @param string $definition A URI or an empty string.
      * @throws InvalidArgumentException If $definition is not a string.
      */
-    public function setDefinition($definition)
+    public function setDefinition($definition): void
     {
         if (is_string($definition)) {
             $this->definition = $definition;
@@ -152,17 +152,17 @@ class CustomOperator extends Operator implements IExternal
      *
      * @return string A URI or an empty string.
      */
-    public function getDefinition()
+    public function getDefinition(): string
     {
         return $this->definition;
     }
 
     /**
-     * Whether or not a value is defined for the definition attribute.
+     * Whether a value is defined for the definition attribute.
      *
      * @return bool
      */
-    public function hasDefinition()
+    public function hasDefinition(): bool
     {
         return $this->getDefinition() !== '';
     }
@@ -170,10 +170,10 @@ class CustomOperator extends Operator implements IExternal
     /**
      * Get the XML content of the custom operator itself and its content.
      *
-     * @return SerializableDomDocument A DOMDocument (serializable) object representing the custom operator itself.
+     * @return SerializableDomDocument|null A DOMDocument (serializable) object representing the custom operator itself.
      * @throws RuntimeException If the XML content of the custom operator and/or its content cannot be transformed into a valid DOMDocument.
      */
-    public function getXml()
+    public function getXml(): ?SerializableDomDocument
     {
         return $this->getExternalComponent()->getXml();
     }
@@ -183,7 +183,7 @@ class CustomOperator extends Operator implements IExternal
      *
      * @param string $xmlString
      */
-    public function setXmlString($xmlString)
+    public function setXmlString($xmlString): void
     {
         $this->xmlString = $xmlString;
 
@@ -197,7 +197,7 @@ class CustomOperator extends Operator implements IExternal
      *
      * @return string
      */
-    public function getXmlString()
+    public function getXmlString(): string
     {
         return $this->xmlString;
     }
@@ -207,7 +207,7 @@ class CustomOperator extends Operator implements IExternal
      *
      * @param ExternalQtiComponent $externalComponent
      */
-    private function setExternalComponent(ExternalQtiComponent $externalComponent)
+    private function setExternalComponent(ExternalQtiComponent $externalComponent): void
     {
         $this->externalComponent = $externalComponent;
     }
@@ -217,7 +217,7 @@ class CustomOperator extends Operator implements IExternal
      *
      * @return ExternalQtiComponent
      */
-    private function getExternalComponent()
+    private function getExternalComponent(): ExternalQtiComponent
     {
         return $this->externalComponent;
     }
@@ -225,7 +225,7 @@ class CustomOperator extends Operator implements IExternal
     /**
      * @return string
      */
-    public function getQtiClassName()
+    public function getQtiClassName(): string
     {
         return 'customOperator';
     }
@@ -235,7 +235,7 @@ class CustomOperator extends Operator implements IExternal
      *
      * @return bool
      */
-    public function isPure()
+    public function isPure(): bool
     {
         return false; // Too impredictable, for instance calling web service --> impure
     }

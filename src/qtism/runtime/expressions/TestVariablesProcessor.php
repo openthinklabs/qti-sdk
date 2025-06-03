@@ -67,7 +67,7 @@ class TestVariablesProcessor extends ItemSubsetProcessor
      * @return MultipleContainer
      * @throws ExpressionProcessingException
      */
-    public function process()
+    public function process(): MultipleContainer
     {
         $testSession = $this->getState();
         $itemSubset = $this->getItemSubset();
@@ -104,7 +104,7 @@ class TestVariablesProcessor extends ItemSubsetProcessor
 
                         if ($identifier === $id) {
                             $var = $itemSession->getVariable($id);
-                            $weight = (empty($weightIdentifier)) ? false : $testSession->getWeight("${itemRefIdentifier}.${weightIdentifier}");
+                            $weight = (empty($weightIdentifier)) ? false : $testSession->getWeight("{$itemRefIdentifier}.{$weightIdentifier}");
 
                             // Single cardinality? Does it match the baseType?
                             if ($var->getCardinality() === Cardinality::SINGLE && in_array($var->getBaseType(), $baseTypes) && $var->getValue() !== null) {
@@ -152,7 +152,7 @@ class TestVariablesProcessor extends ItemSubsetProcessor
     /**
      * @return string
      */
-    protected function getExpressionType()
+    protected function getExpressionType(): string
     {
         return TestVariables::class;
     }

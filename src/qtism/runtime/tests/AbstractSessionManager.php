@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2013-2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2013-2023 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  * @author Jérôme Bogaerts <jerome@taotesting.com>
  * @license GPLv2
@@ -31,6 +31,7 @@ use qtism\data\AssessmentTest;
 use qtism\data\IAssessmentItem;
 use qtism\data\NavigationMode;
 use qtism\data\SubmissionMode;
+use qtism\data\TestPart;
 
 /**
  * The AbstractSessionManager class is a bed for instantiating
@@ -61,7 +62,7 @@ abstract class AbstractSessionManager
      *
      * @param FileManager $fileManager
      */
-    public function setFileManager(FileManager $fileManager)
+    public function setFileManager(FileManager $fileManager): void
     {
         $this->fileManager = $fileManager;
     }
@@ -71,7 +72,7 @@ abstract class AbstractSessionManager
      *
      * @return FileManager
      */
-    public function getFileManager()
+    public function getFileManager(): FileManager
     {
         return $this->fileManager;
     }
@@ -85,7 +86,7 @@ abstract class AbstractSessionManager
      *
      * @return AssessmentTestSession An AssessmentTestSession object.
      */
-    public function createAssessmentTestSession(AssessmentTest $test, Route $route = null, $config = 0)
+    public function createAssessmentTestSession(AssessmentTest $test, Route $route = null, $config = 0): AssessmentTestSession
     {
         return $this->instantiateAssessmentTestSession($test, $this->getRoute($test, $route), $config);
     }
@@ -99,7 +100,7 @@ abstract class AbstractSessionManager
      *
      * @return AssessmentItemSession
      */
-    public function createAssessmentItemSession(IAssessmentItem $assessmentItem, $navigationMode = NavigationMode::LINEAR, $submissionMode = SubmissionMode::INDIVIDUAL)
+    public function createAssessmentItemSession(IAssessmentItem $assessmentItem, $navigationMode = NavigationMode::LINEAR, $submissionMode = SubmissionMode::INDIVIDUAL): AssessmentItemSession
     {
         return $this->instantiateAssessmentItemSession($assessmentItem, $navigationMode, $submissionMode);
     }
@@ -112,7 +113,7 @@ abstract class AbstractSessionManager
      * @param int $config (optional) The configuration of the AssessmentTestSession object.
      * @return AssessmentTestSession A freshly instantiated AssessmentTestSession.
      */
-    abstract protected function instantiateAssessmentTestSession(AssessmentTest $test, Route $route, $config = 0);
+    abstract protected function instantiateAssessmentTestSession(AssessmentTest $test, Route $route, $config = 0): AssessmentTestSession;
 
     /**
      * Contains the logic of instantiating the appropriate AssessmentItemSession implementation.
@@ -122,19 +123,30 @@ abstract class AbstractSessionManager
      * @param int $submissionMode A value from the SubmissionMode enumeration.
      * @return AssessmentItemSession A freshly instantiated AssessmentItemSession.
      */
-    abstract protected function instantiateAssessmentItemSession(IAssessmentItem $assessmentItem, $navigationMode, $submissionMode);
+    abstract protected function instantiateAssessmentItemSession(IAssessmentItem $assessmentItem, $navigationMode, $submissionMode): AssessmentItemSession;
 
     /**
-     * Contains the Route create logic depending on whether or not
+     * Contains the Route create logic depending on whether
      * an optional Route to be used is given or not.
      *
      * @param AssessmentTest $test
      * @param Route $route
      * @return Route
      */
-    protected function getRoute(AssessmentTest $test, Route $route = null)
+    protected function getRoute(AssessmentTest $test, Route $route = null): Route
     {
         return $route ?? $this->createRoute($test);
+    }
+
+    /**
+     * Allow to recreate route items when AssessmentTest structure is changed
+     *
+     * @param AssessmentTest $test
+     * @return Route
+     */
+    public function recreateRoute(AssessmentTest $test): Route
+    {
+        return $this->createRoute($test);
     }
 
     /**
@@ -144,10 +156,11 @@ abstract class AbstractSessionManager
      * @param AssessmentTest $test
      * @return Route A newly instantiated Route object.
      */
-    protected function createRoute(AssessmentTest $test)
+    protected function createRoute(AssessmentTest $test): Route
     {
         $routeStack = [];
 
+        /** @var TestPart $testPart */
         foreach ($test->getTestParts() as $testPart) {
             $assessmentSectionStack = [];
 
@@ -192,16 +205,6 @@ abstract class AbstractSessionManager
                             $route->appendRoute($r);
                         }
 
-                        // Add to the last item of the selection the branch rules of the AssessmentSection/testPart
-                        // on which the selection is applied... Only if the route contains something (empty assessmentSection edge case).
-                        if ($route->count() > 0) {
-                            $route->getLastRouteItem()->addBranchRules($current->getBranchRules());
-
-                            // Do the same as for branch rules for pre conditions, except that they must be
-                            // attached on the first item of the route.
-                            $route->getFirstRouteItem()->addPreConditions($current->getPreConditions());
-                        }
-
                         array_push($routeStack, $route);
                         array_pop($assessmentSectionStack);
                     } elseif ($current instanceof AssessmentItemRef) {
@@ -216,6 +219,8 @@ abstract class AbstractSessionManager
 
         $finalRoutes = $routeStack;
         $route = new SelectableRoute();
+
+        /** @var SelectableRoute $finalRoute */
         foreach ($finalRoutes as $finalRoute) {
             $route->appendRoute($finalRoute);
         }

@@ -24,6 +24,7 @@
 namespace qtism\runtime\expressions\operators;
 
 use qtism\data\expressions\operators\FieldValue;
+use qtism\runtime\common\RecordContainer;
 
 /**
  * The FieldValueProcessor class aims at processing FieldValue expressions.
@@ -42,24 +43,29 @@ class FieldValueProcessor extends OperatorProcessor
      * @return mixed|null A QTI Runtime compliant value or null if there is no field with that identifier.
      * @throws OperatorProcessingException
      */
+    #[\ReturnTypeWillChange]
     public function process()
     {
-        $operands = $this->getOperands();
+        $operand = $this->getOperands()[0];
 
-        if ($operands->exclusivelyRecord() === false) {
+        if ($operand === null) {
+            return null;
+        }
+
+        if (!$operand instanceof RecordContainer) {
             $msg = 'The FieldValue operator only accepts operands with a cardinality of record.';
             throw new OperatorProcessingException($msg, $this, OperatorProcessingException::WRONG_CARDINALITY);
         }
 
         $fieldIdentifier = $this->getExpression()->getFieldIdentifier();
 
-        return $operands[0][$fieldIdentifier];
+        return $operand[$fieldIdentifier];
     }
 
     /**
      * @return string
      */
-    protected function getExpressionType()
+    protected function getExpressionType(): string
     {
         return FieldValue::class;
     }

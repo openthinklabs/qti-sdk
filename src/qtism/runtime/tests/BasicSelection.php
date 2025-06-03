@@ -36,7 +36,7 @@ class BasicSelection extends AbstractSelection
      *
      * @return SelectableRouteCollection A collection of SelectableRoute object describing the performed selection.
      */
-    public function select()
+    public function select(): SelectableRouteCollection
     {
         $assessmentSection = $this->getAssessmentSection();
         $selection = $assessmentSection->getSelection();
@@ -74,12 +74,13 @@ class BasicSelection extends AbstractSelection
 
                     if ($withReplacement === false) {
                         unset($selectionBag[$baseIndex]);
-                        $selectionBag = array_values($selectionBag);
                         $selectionBagCount--;
                         $select--;
                     }
                 }
             }
+            // reset indexes for remaining selections
+            $selectionBag = array_values($selectionBag);
 
             for ($i = 0; $i < $select; $i++) {
                 $selectedIndex = mt_rand(0, $selectionBagCount - 1);

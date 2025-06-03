@@ -30,6 +30,7 @@ use qtism\common\collections\IdentifierCollection;
 use qtism\common\utils\Version;
 use qtism\data\content\FlowStaticCollection;
 use qtism\data\content\TextOrVariableCollection;
+use qtism\data\content\xhtml\html5\Ruby;
 use qtism\data\QtiComponent;
 use qtism\data\QtiComponentCollection;
 use qtism\data\ShowHide;
@@ -69,6 +70,7 @@ class GapChoiceMarshaller extends ContentMarshaller
         'textRun',
         'tt',
         'var',
+        Ruby::QTI_CLASS_NAME
     ];
 
     /**
@@ -77,7 +79,7 @@ class GapChoiceMarshaller extends ContentMarshaller
      * @return mixed
      * @throws UnmarshallingException
      */
-    protected function unmarshallChildrenKnown(DOMElement $element, QtiComponentCollection $children)
+    protected function unmarshallChildrenKnown(DOMElement $element, QtiComponentCollection $children): QtiComponent
     {
         $version = $this->getVersion();
         $expectedGapImgName = ($this->isWebComponentFriendly()) ? 'qti-gap-img' : 'gapImg';
@@ -169,7 +171,7 @@ class GapChoiceMarshaller extends ContentMarshaller
      * @param array $elements
      * @return DOMElement
      */
-    protected function marshallChildrenKnown(QtiComponent $component, array $elements)
+    protected function marshallChildrenKnown(QtiComponent $component, array $elements): DOMElement
     {
         $version = $this->getVersion();
         $element = $this->createElement($component);
@@ -217,7 +219,7 @@ class GapChoiceMarshaller extends ContentMarshaller
         return $element;
     }
 
-    protected function setLookupClasses()
+    protected function setLookupClasses(): void
     {
         $this->lookupClasses = ["qtism\\data\\content\\interactions"];
     }

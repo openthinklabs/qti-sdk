@@ -41,7 +41,7 @@ class AreaMapEntryMarshaller extends Marshaller
      * @param QtiComponent $component An AreaMapEntry object.
      * @return DOMElement The according DOMElement object.
      */
-    protected function marshall(QtiComponent $component)
+    protected function marshall(QtiComponent $component): DOMElement
     {
         $element = $this->createElement($component);
 
@@ -56,10 +56,10 @@ class AreaMapEntryMarshaller extends Marshaller
      * Unmarshall a DOMElement object corresponding to a QTI areaMapEntry element.
      *
      * @param DOMElement $element A DOMElement object.
-     * @return QtiComponent An AreaMapEntry object.
+     * @return AreaMapEntry An AreaMapEntry object.
      * @throws UnmarshallingException
      */
-    protected function unmarshall(DOMElement $element)
+    protected function unmarshall(DOMElement $element): AreaMapEntry
     {
         if (($shape = $this->getDOMElementAttributeAs($element, 'shape')) !== null) {
             $shapeVal = QtiShape::getConstantByName($shape);
@@ -77,7 +77,7 @@ class AreaMapEntryMarshaller extends Marshaller
                         }
                     } catch (Exception $e) {
                         if (!$e instanceof UnmarshallingException) {
-                            $msg = "The attribute 'coords' with value '${coords}' has an invalid value.";
+                            $msg = "The attribute 'coords' with value '{$coords}' has an invalid value.";
                             throw new UnmarshallingException($msg, $element, $e);
                         } else {
                             throw $e;
@@ -88,7 +88,7 @@ class AreaMapEntryMarshaller extends Marshaller
                     throw new UnmarshallingException($msg, $element);
                 }
             } else {
-                $msg = "The 'shape' attribute value '${shape}' is not a valid value to represent QTI shapes.";
+                $msg = "The 'shape' attribute value '{$shape}' is not a valid value to represent QTI shapes.";
                 throw new UnmarshallingException($msg, $element);
             }
         } else {
@@ -100,7 +100,7 @@ class AreaMapEntryMarshaller extends Marshaller
     /**
      * @return string
      */
-    public function getExpectedQtiClassName()
+    public function getExpectedQtiClassName(): string
     {
         return 'areaMapEntry';
     }

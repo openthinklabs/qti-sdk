@@ -48,7 +48,7 @@ class OutcomeMaximumProcessor extends ItemSubsetProcessor
      * @return MultipleContainer|null A MultipleContainer object with baseType float containing all the retrieved normalMaximum values or NULL if no declared maximum in the sub-set.
      * @throws ExpressionProcessingException
      */
-    public function process()
+    public function process(): ?MultipleContainer
     {
         $itemSubset = $this->getItemSubset();
 
@@ -76,7 +76,7 @@ class OutcomeMaximumProcessor extends ItemSubsetProcessor
                 if (isset($itemSession[$id]) && $itemSession->getVariable($id) instanceof OutcomeVariable) {
                     $var = $itemSession->getVariable($id);
                     $itemRefIdentifier = $itemSession->getAssessmentItem()->getIdentifier();
-                    $weight = (empty($weightIdentifier)) ? false : $testSession->getWeight("${itemRefIdentifier}.${weightIdentifier}");
+                    $weight = (empty($weightIdentifier)) ? false : $testSession->getWeight("{$itemRefIdentifier}.{$weightIdentifier}");
 
                     // Does this OutcomeVariable contain a value for normalMaximum?
                     if (($normalMaximum = $var->getNormalMaximum()) !== false) {
@@ -104,7 +104,7 @@ class OutcomeMaximumProcessor extends ItemSubsetProcessor
     /**
      * @return string
      */
-    protected function getExpressionType()
+    protected function getExpressionType(): string
     {
         return OutcomeMaximum::class;
     }

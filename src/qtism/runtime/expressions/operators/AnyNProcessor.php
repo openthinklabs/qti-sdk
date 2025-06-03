@@ -54,7 +54,7 @@ class AnyNProcessor extends OperatorProcessor
      * @return QtiBoolean|null A boolean value of true if at least min of the sub-expressions are true and at most max of the sub-expressions are true. NULL is returned if the correct value for the operator cannot be determined.
      * @throws OperatorProcessingException
      */
-    public function process()
+    public function process(): ?QtiBoolean
     {
         $operands = $this->getOperands();
 
@@ -71,10 +71,10 @@ class AnyNProcessor extends OperatorProcessor
             $varValue = $state[$varName];
 
             if ($varValue === null) {
-                $msg = "The variable with name '${varName}' could not be resolved or is null.";
+                $msg = "The variable with name '{$varName}' could not be resolved or is null.";
                 throw new OperatorProcessingException($msg, $this, OperatorProcessingException::NONEXISTENT_VARIABLE);
             } elseif (!$varValue instanceof QtiInteger) {
-                $msg = "The variable with name '${varName}' is not an integer.";
+                $msg = "The variable with name '{$varName}' is not an integer.";
                 throw new OperatorProcessingException($msg, $this, OperatorProcessingException::WRONG_BASETYPE);
             } else {
                 $min = $varValue->getValue();
@@ -88,10 +88,10 @@ class AnyNProcessor extends OperatorProcessor
             $varValue = $state[$varName];
 
             if ($varValue === null) {
-                $msg = "The variable with name '${varName}' could not be resolved or is null.";
+                $msg = "The variable with name '{$varName}' could not be resolved or is null.";
                 throw new OperatorProcessingException($msg, $this, OperatorProcessingException::NONEXISTENT_VARIABLE);
             } elseif (!$varValue instanceof QtiInteger) {
-                $msg = "The variable with name '${varName}' is not an integer.";
+                $msg = "The variable with name '{$varName}' is not an integer.";
                 throw new OperatorProcessingException($msg, $this, OperatorProcessingException::WRONG_VARIABLE_BASETYPE);
             } else {
                 $max = $varValue->getValue();
@@ -129,7 +129,7 @@ class AnyNProcessor extends OperatorProcessor
     /**
      * @return string
      */
-    protected function getExpressionType()
+    protected function getExpressionType(): string
     {
         return AnyN::class;
     }

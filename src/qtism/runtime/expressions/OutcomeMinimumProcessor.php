@@ -48,7 +48,7 @@ class OutcomeMinimumProcessor extends ItemSubsetProcessor
      * @return MultipleContainer|null A MultipleContainer object with baseType float containing all the retrieved normalMinimum values or NULL if no declared minimum in the sub-set.
      * @throws ExpressionProcessingException
      */
-    public function process()
+    public function process(): ?MultipleContainer
     {
         $itemSubset = $this->getItemSubset();
         $testSession = $this->getState();
@@ -71,7 +71,7 @@ class OutcomeMinimumProcessor extends ItemSubsetProcessor
                 if (isset($itemSession[$id]) && $itemSession->getVariable($id) instanceof OutcomeVariable) {
                     $var = $itemSession->getVariable($id);
                     $itemRefIdentifier = $itemSession->getAssessmentItem()->getIdentifier();
-                    $weight = (empty($weightIdentifier)) ? false : $testSession->getWeight("${itemRefIdentifier}.${weightIdentifier}");
+                    $weight = (empty($weightIdentifier)) ? false : $testSession->getWeight("{$itemRefIdentifier}.{$weightIdentifier}");
 
                     // Does this OutcomeVariable contain a value for normalMaximum?
                     if (($normalMinimum = $var->getNormalMinimum()) !== false) {
@@ -94,7 +94,7 @@ class OutcomeMinimumProcessor extends ItemSubsetProcessor
     /**
      * @return string
      */
-    protected function getExpressionType()
+    protected function getExpressionType(): string
     {
         return OutcomeMinimum::class;
     }

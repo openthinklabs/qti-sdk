@@ -95,7 +95,7 @@ class PhpMarshallingContext
      *
      * @param array $objectCount
      */
-    protected function setObjectCount(array $objectCount)
+    protected function setObjectCount(array $objectCount): void
     {
         $this->objectCount = $objectCount;
     }
@@ -105,7 +105,7 @@ class PhpMarshallingContext
      *
      * @return array
      */
-    protected function getObjectCount()
+    protected function getObjectCount(): array
     {
         return $this->objectCount;
     }
@@ -115,7 +115,7 @@ class PhpMarshallingContext
      *
      * @param array $datatypeCount
      */
-    protected function setDatatypeCount(array $datatypeCount)
+    protected function setDatatypeCount(array $datatypeCount): void
     {
         $this->datatypeCount = $datatypeCount;
     }
@@ -125,7 +125,7 @@ class PhpMarshallingContext
      *
      * @return array
      */
-    protected function getDatatypeCount()
+    protected function getDatatypeCount(): array
     {
         return $this->datatypeCount;
     }
@@ -135,7 +135,7 @@ class PhpMarshallingContext
      *
      * @param SplStack $variableStack
      */
-    protected function setVariableStack(SplStack $variableStack)
+    protected function setVariableStack(SplStack $variableStack): void
     {
         $this->variableStack = $variableStack;
     }
@@ -145,7 +145,7 @@ class PhpMarshallingContext
      *
      * @return SplStack
      */
-    protected function getVariableStack()
+    protected function getVariableStack(): SplStack
     {
         return $this->variableStack;
     }
@@ -155,7 +155,7 @@ class PhpMarshallingContext
      *
      * @param bool $formatOutput
      */
-    public function setFormatOutput($formatOutput)
+    public function setFormatOutput($formatOutput): void
     {
         $this->formatOutput = $formatOutput;
     }
@@ -165,7 +165,7 @@ class PhpMarshallingContext
      *
      * @return bool
      */
-    public function mustFormatOutput()
+    public function mustFormatOutput(): bool
     {
         return $this->formatOutput;
     }
@@ -175,7 +175,7 @@ class PhpMarshallingContext
      *
      * @param PhpStreamAccess $streamAccess An access to a PHP source code stream.
      */
-    protected function setStreamAccess(PhpStreamAccess $streamAccess)
+    protected function setStreamAccess(PhpStreamAccess $streamAccess): void
     {
         $this->streamAccess = $streamAccess;
     }
@@ -185,7 +185,7 @@ class PhpMarshallingContext
      *
      * @return PhpStreamAccess An access to a PHP source code stream.
      */
-    public function getStreamAccess()
+    public function getStreamAccess(): PhpStreamAccess
     {
         return $this->streamAccess;
     }
@@ -196,7 +196,7 @@ class PhpMarshallingContext
      * @param string|array $values A string or an array of strings to be pushed on the variable names stack.
      * @throws InvalidArgumentException If $value or an item of $value is not a non-empty string.
      */
-    public function pushOnVariableStack($values)
+    public function pushOnVariableStack($values): void
     {
         if (is_array($values) === false) {
             $values = [$values];
@@ -220,11 +220,11 @@ class PhpMarshallingContext
      * @throws RuntimeException If the the quantity of elements in the stack before popping is less than $quantity.
      * @throws InvalidArgumentException If $quantity < 1.
      */
-    public function popFromVariableStack($quantity = 1)
+    public function popFromVariableStack($quantity = 1): array
     {
         $quantity = (int)$quantity;
         if ($quantity < 1) {
-            $msg = "The 'quantity' argument must be >= 1, '${quantity}' given.";
+            $msg = "The 'quantity' argument must be >= 1, '{$quantity}' given.";
             throw new InvalidArgumentException($msg);
         }
 
@@ -232,7 +232,7 @@ class PhpMarshallingContext
         $stackCount = count($stack);
 
         if ($stackCount < $quantity) {
-            $msg = "The number of elements in the variable names stack (${stackCount}) is lower than the requested quantity (${quantity}).";
+            $msg = "The number of elements in the variable names stack ({$stackCount}) is lower than the requested quantity ({$quantity}).";
             throw new RuntimeException($msg);
         }
 
@@ -250,7 +250,7 @@ class PhpMarshallingContext
      * @param mixed $value A value.
      * @return string A variable name without the leading dollar sign ('$').
      */
-    public function generateVariableName($value)
+    public function generateVariableName($value): string
     {
         $occurence = 0;
 

@@ -43,7 +43,7 @@ class TemplateElementMarshaller extends ContentMarshaller
      * @return mixed
      * @throws UnmarshallingException
      */
-    protected function unmarshallChildrenKnown(DOMElement $element, QtiComponentCollection $children)
+    protected function unmarshallChildrenKnown(DOMElement $element, QtiComponentCollection $children): QtiComponent
     {
         $fqClass = $this->lookupClass($element);
 
@@ -55,7 +55,7 @@ class TemplateElementMarshaller extends ContentMarshaller
                     try {
                         $component->setShowHide(ShowHide::getConstantByName($showHide));
                     } catch (InvalidArgumentException $e) {
-                        $msg = "'${showHide}' is not a valid value for the 'showHide' attribute of element '" . $element->localName . "'.";
+                        $msg = "'{$showHide}' is not a valid value for the 'showHide' attribute of element '" . $element->localName . "'.";
                         throw new UnmarshallingException($msg, $element, $e);
                     }
 
@@ -73,7 +73,7 @@ class TemplateElementMarshaller extends ContentMarshaller
                         $component->setContent($content);
                     } catch (InvalidArgumentException $e) {
                         $mustContain = ($element->localName === 'feedbackInline') ? 'inline' : 'block';
-                        $msg = "The content of the '" . $element->localName . "' is invalid. It must only contain '${mustContain}' elements.";
+                        $msg = "The content of the '" . $element->localName . "' is invalid. It must only contain '{$mustContain}' elements.";
                         throw new UnmarshallingException($msg, $element, $e);
                     }
 
@@ -100,7 +100,7 @@ class TemplateElementMarshaller extends ContentMarshaller
      * @param array $elements
      * @return DOMElement
      */
-    protected function marshallChildrenKnown(QtiComponent $component, array $elements)
+    protected function marshallChildrenKnown(QtiComponent $component, array $elements): DOMElement
     {
         $element = $this->createElement($component);
         $this->fillElement($element, $component);
@@ -119,7 +119,7 @@ class TemplateElementMarshaller extends ContentMarshaller
         return $element;
     }
 
-    protected function setLookupClasses()
+    protected function setLookupClasses(): void
     {
         $this->lookupClasses = ["qtism\\data\\content"];
     }

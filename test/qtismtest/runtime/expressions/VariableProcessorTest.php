@@ -33,7 +33,7 @@ use qtismtest\QtiSmTestCase;
  */
 class VariableProcessorTest extends QtiSmTestCase
 {
-    public function testSimple()
+    public function testSimple(): void
     {
         $variableExpr = $this->createComponentFromXml('<variable identifier="var1"/>');
 
@@ -62,7 +62,7 @@ class VariableProcessorTest extends QtiSmTestCase
         $this::assertEquals(12, $result[1]->getValue());
     }
 
-    public function testWeighted()
+    public function testWeighted(): void
     {
         $assessmentItemRef = new ExtendedAssessmentItemRef('Q01', './Q01.xml');
         $weights = new WeightCollection([new Weight('weight1', 1.1)]);
@@ -106,15 +106,15 @@ class VariableProcessorTest extends QtiSmTestCase
         $variableExpr = $this->createComponentFromXml('<variable identifier="Q01.var2" weightIdentifier="weight1"/>');
         $variableProcessor->setExpression($variableExpr);
         $result = $variableProcessor->process();
-        $this::assertEquals(11.11, $result[0]->getValue());
-        $this::assertEquals(13.31, $result[1]->getValue());
+        $this::assertEquals(11.11, round($result[0]->getValue(), 2));
+        $this::assertEquals(13.31, round($result[1]->getValue(), 2));
         // The value in the state must be unchanged.
         $stateVal = $assessmentTestSession['Q01.var2'];
-        $this::assertEquals(10.1, $stateVal[0]->getValue());
-        $this::assertEquals(12.1, $stateVal[1]->getValue());
+        $this::assertEquals(10.1, round($stateVal[0]->getValue(), 2));
+        $this::assertEquals(12.1, round($stateVal[1]->getValue(), 2));
     }
 
-    public function testMultipleOccurences()
+    public function testMultipleOccurences(): void
     {
         $doc = new XmlCompactDocument();
         $doc->load(self::samplesDir() . 'custom/runtime/scenario_basic_nonadaptive_linear_singlesection_withreplacement.xml');

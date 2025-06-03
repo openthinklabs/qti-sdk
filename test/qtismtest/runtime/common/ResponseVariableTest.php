@@ -14,6 +14,7 @@ use qtism\common\enums\BaseType;
 use qtism\common\enums\Cardinality;
 use qtism\data\state\AreaMapping;
 use qtism\data\state\Mapping;
+use qtism\data\state\ResponseDeclaration;
 use qtism\runtime\common\MultipleContainer;
 use qtism\runtime\common\OrderedContainer;
 use qtism\runtime\common\RecordContainer;
@@ -25,7 +26,7 @@ use qtismtest\QtiSmTestCase;
  */
 class ResponseVariableTest extends QtiSmTestCase
 {
-    public function testCreateFromVariableDeclarationExtended()
+    public function testCreateFromVariableDeclarationExtended(): void
     {
         $factory = $this->getMarshallerFactory('2.1.0');
         $element = $this->createDOMElement('
@@ -54,6 +55,7 @@ class ResponseVariableTest extends QtiSmTestCase
 				</areaMapping>
 			</responseDeclaration>
 		');
+        /** @var ResponseDeclaration $responseDeclaration */
         $responseDeclaration = $factory->createMarshaller($element)->unmarshall($element);
         $responseVariable = ResponseVariable::createFromDataModel($responseDeclaration);
         $this::assertInstanceOf(ResponseVariable::class, $responseVariable);
@@ -66,8 +68,10 @@ class ResponseVariableTest extends QtiSmTestCase
         $this::assertTrue($responseVariable->isNull());
 
         $defaultValue = $responseVariable->getDefaultValue();
-        $this::assertInstanceOf(OrderedContainer::class, $defaultValue);
-        $this::assertCount(3, $defaultValue);
+        $this::assertEquals(
+            $defaultValue,
+            new OrderedContainer(BaseType::PAIR, [new QtiPair('A', 'B'), new QtiPair('C', 'D'), new QtiPair('E', 'F')])
+        );
 
         $mapping = $responseVariable->getMapping();
         $this::assertInstanceOf(Mapping::class, $mapping);
@@ -97,36 +101,46 @@ class ResponseVariableTest extends QtiSmTestCase
         $responseVariable->initialize();
         $this::assertInstanceOf(OrderedContainer::class, $responseVariable->getValue());
         $this::assertTrue($responseVariable->isNull());
+        $this::assertFalse($responseVariable->isInitializedFromDefaultValue());
 
         // If I apply the default value...
         $responseVariable->applyDefaultValue();
         $this::assertInstanceOf(OrderedContainer::class, $responseVariable->getValue());
         $this::assertCount(3, $responseVariable->getValue());
-        $this::assertTrue($responseVariable->getValue()->equals(new OrderedContainer(BaseType::PAIR, [new QtiPair('A', 'B'), new QtiPair('C', 'D'), new QtiPair('E', 'F')])));
+        $this::assertTrue($responseVariable->getValue()->equals($defaultValue));
+        $this::assertTrue($responseVariable->isInitializedFromDefaultValue());
+
+        // If I set value once more...
+        $responseVariable->setValue($defaultValue);
+        $this::assertFalse($responseVariable->isInitializedFromDefaultValue());
     }
 
-    public function testIsCorrectWithNullCorrectResponse()
+    public function testIsCorrectWithNullCorrectResponse(): void
     {
         $responseVariable = new ResponseVariable('MYVAR', Cardinality::SINGLE, BaseType::INTEGER, new QtiInteger(25));
         $this::assertFalse($responseVariable->isCorrect());
     }
 
-    public function testGetScalarDataModelValuesSingleCardinality()
+    public function testGetScalarDataModelValuesSingleCardinality(): void
     {
         $responseVariable = new ResponseVariable('MYVAR', Cardinality::SINGLE, BaseType::INTEGER, new QtiInteger(10));
         $values = $responseVariable->getDataModelValues();
 
         $this::assertCount(1, $values);
         $this::assertSame(10, $values[0]->getValue());
+        $this::assertSame('', $values[0]->getFieldIdentifier());
+        $this::assertSame(-1, $values[0]->getBaseType());
 
         $responseVariable = new ResponseVariable('MYVAR', Cardinality::SINGLE, BaseType::FLOAT, new QtiFloat(10.1));
         $values = $responseVariable->getDataModelValues();
 
         $this::assertCount(1, $values);
         $this::assertSame(10.1, $values[0]->getValue());
+        $this::assertSame('', $values[0]->getFieldIdentifier());
+        $this::assertSame(-1, $values[0]->getBaseType());
     }
 
-    public function testGetNonScalarDataModelValuesSingleCardinality()
+    public function testGetNonScalarDataModelValuesSingleCardinality(): void
     {
         // QtiPair
         $qtiPair = new QtiPair('A', 'B');
@@ -135,6 +149,8 @@ class ResponseVariableTest extends QtiSmTestCase
 
         $this::assertCount(1, $values);
         $this::assertTrue($qtiPair->equals($values[0]->getValue()));
+        $this::assertSame('', $values[0]->getFieldIdentifier());
+        $this::assertSame(-1, $values[0]->getBaseType());
 
         // QtiPoint
         $qtiPoint = new QtiPoint(1, 1);
@@ -143,6 +159,8 @@ class ResponseVariableTest extends QtiSmTestCase
 
         $this::assertCount(1, $values);
         $this::assertTrue($qtiPoint->equals($values[0]->getValue()));
+        $this::assertSame('', $values[0]->getFieldIdentifier());
+        $this::assertSame(-1, $values[0]->getBaseType());
 
         // QtiFile
         $fileManager = new FileSystemFileManager();
@@ -163,7 +181,7 @@ class ResponseVariableTest extends QtiSmTestCase
         $this::assertStringEqualsFile($path, $actual->getData());
     }
 
-    public function testGetScalarDataModelValuesMultipleCardinality()
+    public function testGetScalarDataModelValuesMultipleCardinality(): void
     {
         $responseVariable = new ResponseVariable(
             'MYVAR',
@@ -178,10 +196,14 @@ class ResponseVariableTest extends QtiSmTestCase
 
         $this::assertCount(2, $values);
         $this::assertEquals(10, $values[0]->getValue());
+        $this::assertSame('', $values[0]->getFieldIdentifier());
+        $this::assertSame(-1, $values[0]->getBaseType());
         $this::assertEquals(12, $values[1]->getValue());
+        $this::assertSame('', $values[1]->getFieldIdentifier());
+        $this::assertSame(-1, $values[1]->getBaseType());
     }
 
-    public function testGetNonScalarDataModelValuesMultipleCardinality()
+    public function testGetNonScalarDataModelValuesMultipleCardinality(): void
     {
         // QtiPair
         $qtiPair1 = new QtiPair('A', 'B');
@@ -200,7 +222,11 @@ class ResponseVariableTest extends QtiSmTestCase
 
         $this::assertCount(2, $values);
         $this::assertTrue($qtiPair1->equals($values[0]->getValue()));
+        $this::assertSame('', $values[0]->getFieldIdentifier());
+        $this::assertSame(-1, $values[0]->getBaseType());
         $this::assertTrue($qtiPair2->equals($values[1]->getValue()));
+        $this::assertSame('', $values[1]->getFieldIdentifier());
+        $this::assertSame(-1, $values[1]->getBaseType());
 
         // QtiPoint
         $qtiPoint1 = new QtiPoint(0, 0);
@@ -219,7 +245,11 @@ class ResponseVariableTest extends QtiSmTestCase
 
         $this::assertCount(2, $values);
         $this::assertTrue($qtiPoint1->equals($values[0]->getValue()));
+        $this::assertSame('', $values[0]->getFieldIdentifier());
+        $this::assertSame(-1, $values[0]->getBaseType());
         $this::assertTrue($qtiPoint2->equals($values[1]->getValue()));
+        $this::assertSame('', $values[1]->getFieldIdentifier());
+        $this::assertSame(-1, $values[1]->getBaseType());
     }
 
     public function testGetDataModelValuesRecordCardinality(): void
@@ -243,12 +273,20 @@ class ResponseVariableTest extends QtiSmTestCase
 
         $this::assertCount(4, $values);
         $this::assertSame(12, $values[0]->getValue());
+        $this::assertSame('twelve', $values[0]->getFieldIdentifier());
+        $this::assertSame(BaseType::INTEGER, $values[0]->getBaseType());
         $this::assertSame('bar', $values[1]->getValue());
+        $this::assertSame('foo', $values[1]->getFieldIdentifier());
+        $this::assertSame(BaseType::STRING, $values[1]->getBaseType());
         $this::assertNull($values[2]->getValue());
+        $this::assertSame('null', $values[2]->getFieldIdentifier());
+        $this::assertSame(-1, $values[2]->getBaseType());
         $this::assertTrue($qtiPair->equals($values[3]->getValue()));
+        $this::assertSame('pair', $values[3]->getFieldIdentifier());
+        $this::assertSame(BaseType::PAIR, $values[3]->getBaseType());
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         // value, default value and correct response must be independent after cloning.
         $responseVariable = new ResponseVariable('MYVAR', Cardinality::SINGLE, BaseType::INTEGER, new QtiInteger(25));

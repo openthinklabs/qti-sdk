@@ -39,7 +39,7 @@ class TemplateVariable extends Variable
     /**
      * From IMS QTI:
      *
-     * This attribute determines whether or not the template variable's value should be substituted for
+     * This attribute determines whether the template variable's value should be substituted for
      * object parameter values that match its name. See param for more information.
      *
      * @var bool
@@ -49,7 +49,7 @@ class TemplateVariable extends Variable
     /**
      * From IMS QTI:
      *
-     * This attribute determines whether or not the template variable's value should be substituted
+     * This attribute determines whether the template variable's value should be substituted
      * for identifiers that match its name in MathML expressions. See Combining Template Variables
      * and MathML for more information.
      *
@@ -73,13 +73,13 @@ class TemplateVariable extends Variable
     }
 
     /**
-     * Set whether or not the template's value should be substituted for object
+     * Set whether the template's value should be substituted for object
      * parameter values.
      *
      * @param bool $paramVariable
      * @throws InvalidArgumentException
      */
-    public function setParamVariable($paramVariable)
+    public function setParamVariable($paramVariable): void
     {
         if (is_bool($paramVariable)) {
             $this->paramVariable = $paramVariable;
@@ -90,12 +90,12 @@ class TemplateVariable extends Variable
     }
 
     /**
-     * Let you know whether or not the template variable's value should be substituted
+     * Let you know whether the template variable's value should be substituted
      * for object parameter values.
      *
      * @return bool
      */
-    public function isParamVariable()
+    public function isParamVariable(): bool
     {
         return $this->paramVariable;
     }
@@ -107,7 +107,7 @@ class TemplateVariable extends Variable
      * @param bool $mathVariable
      * @throws InvalidArgumentException
      */
-    public function setMathVariable($mathVariable)
+    public function setMathVariable($mathVariable): void
     {
         if (is_bool($mathVariable)) {
             $this->mathVariable = $mathVariable;
@@ -123,7 +123,7 @@ class TemplateVariable extends Variable
      *
      * @return bool
      */
-    public function isMathVariable()
+    public function isMathVariable(): bool
     {
         return $this->mathVariable;
     }
@@ -135,7 +135,7 @@ class TemplateVariable extends Variable
      * @return TemplateVariable
      * @throws InvalidArgumentException
      */
-    public static function createFromDataModel(VariableDeclaration $variableDeclaration)
+    public static function createFromDataModel(VariableDeclaration $variableDeclaration): self
     {
         $variable = parent::createFromDataModel($variableDeclaration);
 

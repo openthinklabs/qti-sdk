@@ -17,7 +17,7 @@ use qtismtest\QtiSmTestCase;
  */
 class QtiBinaryVersionTest extends QtiSmTestCase
 {
-    public function testPersist()
+    public function testPersist(): void
     {
         $stream = new MemoryStream();
         $stream->open();
@@ -30,19 +30,19 @@ class QtiBinaryVersionTest extends QtiSmTestCase
         $this::assertEquals(chr(QtiBinaryVersion::CURRENT_VERSION) . pack('S', 1) . 'M', $stream->getBinary());
     }
 
-    public function testRetrieveCurrentLegacy()
+    public function testRetrieveCurrentLegacy(): void
     {
         $access = $this->createAccessMock(QtiBinaryVersion::CURRENT_VERSION, 'L');
 
         $subject = new QtiBinaryVersion();
         $subject->retrieve($access);
 
-        $this::assertEquals(QtiBinaryVersion::CURRENT_VERSION, $subject->isCurrentVersion());
+        $this::assertTrue($subject->isCurrentVersion());
         $this::assertTrue($subject->isLegacy());
         $this::assertFalse($subject->isMaster());
     }
 
-    public function testRetrieveCurrentMaster()
+    public function testRetrieveCurrentMaster(): void
     {
         $access = $this->createAccessMock(QtiBinaryVersion::CURRENT_VERSION, 'M');
 
@@ -62,7 +62,7 @@ class QtiBinaryVersionTest extends QtiSmTestCase
      * @throws MemoryStreamException
      * @throws StreamAccessException
      */
-    public function testLegacyFeatures(int $versionNumber, array $expectedFeatures)
+    public function testLegacyFeatures(int $versionNumber, array $expectedFeatures): void
     {
         $access = $this->createAccessMock($versionNumber, 'L');
 
@@ -94,6 +94,8 @@ class QtiBinaryVersionTest extends QtiSmTestCase
                 QtiBinaryVersion::VERSION_POSITION_INTEGER => 'storesPositionAndRouteCountAsInteger',
                 QtiBinaryVersion::VERSION_FIRST_MASTER => 'isInBothBranches',
                 QtiBinaryVersion::VERSION_VARIABLE_COUNT_INTEGER => 'storesVariableCountAsInteger',
+                QtiBinaryVersion::VERSION_VARIABLE_WITH_DEFAULT_VALUE_INITIALIZATION_FLAG =>
+                    'storesVariableDefaultValueInitializationFlag',
             ]
         );
     }
@@ -106,7 +108,7 @@ class QtiBinaryVersionTest extends QtiSmTestCase
      * @throws MemoryStreamException
      * @throws StreamAccessException
      */
-    public function testMasterFeatures(int $versionNumber, array $expectedFeatures)
+    public function testMasterFeatures(int $versionNumber, array $expectedFeatures): void
     {
         $access = $this->createAccessMock($versionNumber, 'M');
 
@@ -130,6 +132,8 @@ class QtiBinaryVersionTest extends QtiSmTestCase
             [
                 QtiBinaryVersion::VERSION_FIRST_MASTER => 'isInBothBranches',
                 QtiBinaryVersion::VERSION_VARIABLE_COUNT_INTEGER => 'storesVariableCountAsInteger',
+                QtiBinaryVersion::VERSION_VARIABLE_WITH_DEFAULT_VALUE_INITIALIZATION_FLAG =>
+                    'storesVariableDefaultValueInitializationFlag',
             ]
         );
     }

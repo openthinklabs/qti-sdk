@@ -52,6 +52,12 @@ use qtism\data\content\ModalFeedback;
 use qtism\data\content\SimpleInline;
 use qtism\data\content\TemplateBlock;
 use qtism\data\content\TemplateInline;
+use qtism\data\content\xhtml\html5\Figcaption;
+use qtism\data\content\xhtml\html5\Figure;
+use qtism\data\content\xhtml\html5\Rb;
+use qtism\data\content\xhtml\html5\Rp;
+use qtism\data\content\xhtml\html5\Rt;
+use qtism\data\content\xhtml\html5\Ruby;
 use qtism\data\content\xhtml\lists\Dl;
 use qtism\data\content\xhtml\lists\DlElement;
 use qtism\data\content\xhtml\lists\Li;
@@ -64,6 +70,7 @@ use qtism\data\content\xhtml\tables\Th;
 use qtism\data\content\xhtml\tables\Tr;
 use qtism\data\content\xhtml\text\Blockquote;
 use qtism\data\content\xhtml\text\Div;
+use qtism\data\content\xhtml\Img;
 use qtism\data\ExternalQtiComponent;
 use qtism\data\QtiComponent;
 use qtism\data\QtiComponentCollection;
@@ -106,7 +113,7 @@ abstract class ContentMarshaller extends RecursiveMarshaller
         'graphicGapMatchInteraction',
         'hotspotChoice',
         'hr',
-        'img',
+        Img::QTI_CLASS_NAME_IMG,
         'include',
         'math',
         'mediaInteraction',
@@ -141,6 +148,10 @@ abstract class ContentMarshaller extends RecursiveMarshaller
         'i',
         'kbd',
         'q',
+        Ruby::QTI_CLASS_NAME,
+        Rb::QTI_CLASS_NAME,
+        Rp::QTI_CLASS_NAME,
+        Rt::QTI_CLASS_NAME,
         'samp',
         'small',
         'span',
@@ -177,13 +188,15 @@ abstract class ContentMarshaller extends RecursiveMarshaller
         'modalFeedback',
         'feedbackBlock',
         'bdo',
+        Figure::QTI_CLASS_NAME_FIGURE,
+        Figcaption::QTI_CLASS_NAME_FIGCAPTION,
     ];
 
     /**
      * @param DOMNode $element
      * @return bool
      */
-    protected function isElementFinal(DOMNode $element)
+    protected function isElementFinal(DOMNode $element): bool
     {
         return $element instanceof DOMText || ($element instanceof DOMElement && in_array($element->localName, self::$finals));
     }
@@ -192,7 +205,7 @@ abstract class ContentMarshaller extends RecursiveMarshaller
      * @param QtiComponent $component
      * @return bool
      */
-    protected function isComponentFinal(QtiComponent $component)
+    protected function isComponentFinal(QtiComponent $component): bool
     {
         return in_array($component->getQtiClassName(), self::$finals) || $component instanceof ExternalQtiComponent;
     }
@@ -201,7 +214,7 @@ abstract class ContentMarshaller extends RecursiveMarshaller
      * @param DOMElement $currentNode
      * @return QtiComponentCollection
      */
-    protected function createCollection(DOMElement $currentNode)
+    protected function createCollection(DOMElement $currentNode): QtiComponentCollection
     {
         return new QtiComponentCollection();
     }
@@ -210,7 +223,7 @@ abstract class ContentMarshaller extends RecursiveMarshaller
      * @param QtiComponent $component
      * @return array
      */
-    protected function getChildrenComponents(QtiComponent $component)
+    protected function getChildrenComponents(QtiComponent $component): array
     {
         if ($component instanceof SimpleInline) {
             return $component->getContent()->getArrayCopy();
@@ -288,6 +301,18 @@ abstract class ContentMarshaller extends RecursiveMarshaller
             return $component->getContent()->getArrayCopy();
         } elseif ($component instanceof InfoControl) {
             return $component->getContent()->getArrayCopy();
+        } elseif ($component instanceof Figure) {
+            return $component->getContent()->getArrayCopy();
+        } elseif ($component instanceof Figcaption) {
+            return $component->getContent()->getArrayCopy();
+        } elseif ($component instanceof Ruby) {
+            return $component->getContent()->getArrayCopy();
+        } elseif ($component instanceof Rb) {
+            return $component->getContent()->getArrayCopy();
+        } elseif ($component instanceof Rp) {
+            return $component->getContent()->getArrayCopy();
+        } elseif ($component instanceof Rt) {
+            return $component->getContent()->getArrayCopy();
         }
     }
 
@@ -295,7 +320,7 @@ abstract class ContentMarshaller extends RecursiveMarshaller
      * @param DOMElement $element
      * @return array
      */
-    protected function getChildrenElements(DOMElement $element)
+    protected function getChildrenElements(DOMElement $element): array
     {
         $simpleComposites = self::$simpleComposites;
         $localName = $element->localName;
@@ -341,6 +366,10 @@ abstract class ContentMarshaller extends RecursiveMarshaller
             return self::getChildElements($element);
         } elseif ($localName === 'simpleMatchSet') {
             return $this->getChildElementsByTagName($element, 'simpleAssociableChoice');
+        } elseif ($localName === Figure::QTI_CLASS_NAME_FIGURE) {
+            return $this->getChildElementsByTagName($element, [Figcaption::QTI_CLASS_NAME_FIGCAPTION, Img::QTI_CLASS_NAME_IMG]);
+        } elseif ($localName === Ruby::QTI_CLASS_NAME) {
+            return $this->getChildElementsByTagName($element, [Rb::QTI_CLASS_NAME, Rp::QTI_CLASS_NAME, Rt::QTI_CLASS_NAME]);
         } elseif ($localName === 'gapImg') {
             return $this->getChildElementsByTagName($element, 'object');
         } else {
@@ -351,7 +380,7 @@ abstract class ContentMarshaller extends RecursiveMarshaller
     /**
      * @return string
      */
-    public function getExpectedQtiClassName()
+    public function getExpectedQtiClassName(): string
     {
         return '';
     }
@@ -366,7 +395,7 @@ abstract class ContentMarshaller extends RecursiveMarshaller
      *
      * @return array
      */
-    protected function getLookupClasses()
+    protected function getLookupClasses(): array
     {
         return $this->lookupClasses;
     }
@@ -378,7 +407,7 @@ abstract class ContentMarshaller extends RecursiveMarshaller
      * @return string A fully qualified class name.
      * @throws UnmarshallingException If no class can be found for $element.
      */
-    protected function lookupClass(DOMElement $element)
+    protected function lookupClass(DOMElement $element): string
     {
         $localName = $element->localName;
         if ($this->isWebComponentFriendly() === true && preg_match('/^qti-/', $localName) === 1) {

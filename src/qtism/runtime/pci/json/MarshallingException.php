@@ -32,9 +32,9 @@ use qtism\common\QtiSdkPackageContentException;
  */
 class MarshallingException extends Exception implements QtiSdkPackageContentException
 {
-    const UNKNOWN = 0;
+    public const UNKNOWN = 0;
 
-    const NOT_SUPPORTED = 1;
+    public const NOT_SUPPORTED = 1;
 
     /**
      * Create a new MarshallingException object.
@@ -43,7 +43,7 @@ class MarshallingException extends Exception implements QtiSdkPackageContentExce
      * @param int $code A machine-understandable (see class constants) error code.
      * @param Exception $previous An eventual previous Exception.
      */
-    public function __construct($message, $code = 0, Exception $previous = null)
+    public function __construct($message, $code = 0, ?Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

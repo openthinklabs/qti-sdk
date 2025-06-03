@@ -32,12 +32,12 @@ use qtism\common\collections\AbstractCollection;
 class TimeConstraintCollection extends AbstractCollection
 {
     /**
-     * Checks whether or not $value is an instance of TimeConstraint.
+     * Checks whether $value is an instance of TimeConstraint.
      *
      * @param mixed $value
      * @throws InvalidArgumentException If $value is not an instance of TimeConstraint.
      */
-    protected function checkType($value)
+    protected function checkType($value): void
     {
         if (!$value instanceof TimeConstraint) {
             $msg = 'TimeConstraintCollection objects only accept to store TimeConstraint objects.';

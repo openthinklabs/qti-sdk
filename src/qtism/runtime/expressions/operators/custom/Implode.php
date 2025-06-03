@@ -47,12 +47,12 @@ class Implode extends CustomOperatorProcessor
      * @return QtiString The split value of the second sub-expression given as a parameter.
      * @throws OperatorProcessingException If something goes wrong.
      */
-    public function process()
+    public function process(): ?QtiString
     {
         $operands = $this->getOperands();
 
         if (($c = count($operands)) < 2) {
-            $msg = "The 'qtism.runtime.expressions.operators.custom.Implode' custom operator takes 2 sub-expressions as parameters, ${c} given.";
+            $msg = "The 'qtism.runtime.expressions.operators.custom.Implode' custom operator takes 2 sub-expressions as parameters, {$c} given.";
             throw new OperatorProcessingException($msg, $this, OperatorProcessingException::NOT_ENOUGH_OPERANDS);
         } elseif ($operands->containsNull() === true) {
             return null;

@@ -34,7 +34,7 @@ use qtism\data\expressions\NumberPresented;
  *
  * This expression, which can only be used in outcomes processing, calculates the number
  * of items in a given sub-set that have been attempted (at least once). In other words,
- * items with which the user has interacted, whether or not they provided a response. The
+ * items with which the user has interacted, whether they provided a response. The
  * result is an integer with single cardinality.
  */
 class NumberPresentedProcessor extends ItemSubsetProcessor
@@ -45,7 +45,7 @@ class NumberPresentedProcessor extends ItemSubsetProcessor
      * @return QtiInteger The number of items in the given item sub-set that have been attempted (at least once).
      * @throws ExpressionProcessingException
      */
-    public function process()
+    public function process(): QtiInteger
     {
         $testSession = $this->getState();
         $itemSubset = $this->getItemSubset();
@@ -69,7 +69,7 @@ class NumberPresentedProcessor extends ItemSubsetProcessor
     /**
      * @return string
      */
-    protected function getExpressionType()
+    protected function getExpressionType(): string
     {
         return NumberPresented::class;
     }

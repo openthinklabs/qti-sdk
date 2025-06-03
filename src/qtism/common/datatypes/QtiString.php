@@ -33,12 +33,12 @@ use qtism\common\enums\Cardinality;
 class QtiString extends QtiScalar
 {
     /**
-     * Checks whether or not $value is a valid string.
+     * Checks whether $value is a valid string.
      *
      * @param mixed $value
      * @throws InvalidArgumentException If $value is not a valid string.
      */
-    protected function checkType($value)
+    protected function checkType($value): void
     {
         if (is_string($value) !== true) {
             $msg = 'The String Datatype only accepts to store string values.';
@@ -52,7 +52,7 @@ class QtiString extends QtiScalar
      *
      * @return int A value from the BaseType enumeration.
      */
-    public function getBaseType()
+    public function getBaseType(): int
     {
         return BaseType::STRING;
     }
@@ -63,13 +63,13 @@ class QtiString extends QtiScalar
      *
      * @return int A value from the Cardinality enumeration.
      */
-    public function getCardinality()
+    public function getCardinality(): int
     {
         return Cardinality::SINGLE;
     }
 
     /**
-     * Whether or not the current QtiString object is equal to $obj.
+     * Whether the current QtiString object is equal to $obj.
      *
      * Two QtiString objects are considered to be identical if their intrinsic
      * values are equals. If the current QtiString is an empty string, and $obj
@@ -78,7 +78,7 @@ class QtiString extends QtiScalar
      * @param mixed $obj
      * @return bool
      */
-    public function equals($obj)
+    public function equals($obj): bool
     {
         if ($obj instanceof QtiScalar) {
             return $obj->getValue() === $this->getValue();
@@ -90,9 +90,9 @@ class QtiString extends QtiScalar
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getValue();
     }

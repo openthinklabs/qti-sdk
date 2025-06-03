@@ -45,7 +45,7 @@ abstract class QtiSmRouteTestCase extends QtiSmTestCase
      * @param int $itemCount
      * @return Route
      */
-    public static function buildSimpleRoute($routeClass = Route::class, $testPartCount = 1, $itemCount = 3)
+    public static function buildSimpleRoute($routeClass = Route::class, $testPartCount = 1, $itemCount = 3): Route
     {
         $route = new $routeClass();
         $assessmentTest = new AssessmentTest('test', 'A Test');
@@ -56,19 +56,19 @@ abstract class QtiSmRouteTestCase extends QtiSmTestCase
 
             for ($j = 0; $j < $itemCount; $j++) {
                 $itemNum = $j + 1 + ($itemCount * $i);
-                $assessmentItemRefs[] = new AssessmentItemRef("Q${itemNum}", "Q${itemNum}.xml");
+                $assessmentItemRefs[] = new AssessmentItemRef("Q{$itemNum}", "Q{$itemNum}.xml");
             }
 
             $assessmentSections = new AssessmentSectionCollection();
-            $assessmentSections[] = new AssessmentSection("S${partNum}", "Section ${partNum}", true);
-            $assessmentSections["S${partNum}"]->setSectionParts($assessmentItemRefs);
+            $assessmentSections[] = new AssessmentSection("S{$partNum}", "Section {$partNum}", true);
+            $assessmentSections["S{$partNum}"]->setSectionParts($assessmentItemRefs);
 
             $testParts = new TestPartCollection();
-            $testParts[] = new TestPart("T${partNum}", $assessmentSections);
+            $testParts[] = new TestPart("T{$partNum}", $assessmentSections);
 
             for ($j = 0; $j < count($assessmentItemRefs); $j++) {
                 $itemNum = $j + 1 + ($itemCount * $i);
-                $route->addRouteItem($assessmentItemRefs["Q${itemNum}"], $assessmentSections["S${partNum}"], $testParts["T${partNum}"], $assessmentTest);
+                $route->addRouteItem($assessmentItemRefs["Q{$itemNum}"], $assessmentSections["S{$partNum}"], $testParts["T{$partNum}"], $assessmentTest);
             }
         }
 

@@ -66,28 +66,38 @@ class ResponseValidityConstraint extends QtiComponent
 
     /**
      * The collection of nested AssociationValidityConstraints objects.
+     *
+     * @var AssociationValidityConstraintCollection
      */
     private $associationValidityConstraints;
 
     /**
+     * Metadata defined by @see \qtism\data\content\interactions\Interaction instantiating this ResponseValidityConstraint
+     */
+    private $extraData = [];
+
+    /**
      * Create a new ResponseValidityConstraint object.
      *
-     * If the $patternMask attribute is provided, it represent a constraint to be applied on all string
+     * If the $patternMask attribute is provided, it represents a constraint to be applied on all string
      * values contained by the variable described in the $responseÏdentifier variable.
      *
      * @param string $responseIdentifier The identifier of the response the validity constraint applies to.
      * @param int $minConstraint The minimum cardinality the value to be set to the response must have.
      * @param int $maxConstraint The maximum cardinality the value to be set the response must have.
      * @param string $patternMask (optional) A XML Schema regular expression.
+     * @param array $extraData (optional) Metadata defined by the Interaction instantiating this ResponseValidityConstraint
+     *    @see \qtism\data\content\interactions\Interaction
      * @throws InvalidArgumentException If one or more of the arguments above are invalid.
      */
-    public function __construct($responseIdentifier, $minConstraint, $maxConstraint, $patternMask = '')
+    public function __construct($responseIdentifier, $minConstraint, $maxConstraint, $patternMask = '', $extraData = [])
     {
         $this->setResponseIdentifier($responseIdentifier);
         $this->setMinConstraint($minConstraint);
         $this->setMaxConstraint($maxConstraint);
         $this->setPatternMask($patternMask);
         $this->setAssociationValidityConstraints(new AssociationValidityConstraintCollection());
+        $this->setExtraData($extraData);
     }
 
     /**
@@ -96,7 +106,7 @@ class ResponseValidityConstraint extends QtiComponent
      * @param int $responseIdentifier
      * @throws InvalidArgumentException If $responseIdentifier is not a non-empty string.
      */
-    public function setResponseIdentifier($responseIdentifier)
+    public function setResponseIdentifier($responseIdentifier): void
     {
         if (is_string($responseIdentifier) === false || empty($responseIdentifier)) {
             throw new InvalidArgumentException(
@@ -112,7 +122,7 @@ class ResponseValidityConstraint extends QtiComponent
      *
      * @return string
      */
-    public function getResponseIdentifier()
+    public function getResponseIdentifier(): string
     {
         return $this->responseIdentifier;
     }
@@ -123,7 +133,7 @@ class ResponseValidityConstraint extends QtiComponent
      * @param int $minConstraint A non negative integer (>= 0) integer value.
      * @throws InvalidArgumentException If $minConstraint is not a non negative (>= 0) integer value.
      */
-    public function setMinConstraint($minConstraint)
+    public function setMinConstraint($minConstraint): void
     {
         if (is_int($minConstraint) === false || $minConstraint < 0) {
             throw new InvalidArgumentException(
@@ -139,7 +149,7 @@ class ResponseValidityConstraint extends QtiComponent
      *
      * @return int A non negative (>= 0) integer value.
      */
-    public function getMinConstraint()
+    public function getMinConstraint(): int
     {
         return $this->minConstraint;
     }
@@ -152,7 +162,7 @@ class ResponseValidityConstraint extends QtiComponent
      * @param int $maxConstraint An integer value which is greater than the 'minConstraint' in place.
      * @throws InvalidArgumentException If $maxConstraint is not an integer greater or equal to the 'minConstraint' in place.
      */
-    public function setMaxConstraint($maxConstraint)
+    public function setMaxConstraint($maxConstraint): void
     {
         if (is_int($maxConstraint) === false) {
             throw new InvalidArgumentException(
@@ -178,7 +188,7 @@ class ResponseValidityConstraint extends QtiComponent
      *
      * @return int
      */
-    public function getMaxConstraint()
+    public function getMaxConstraint(): int
     {
         return $this->maxConstraint;
     }
@@ -192,7 +202,7 @@ class ResponseValidityConstraint extends QtiComponent
      *
      * @param string $patternMask An XML Schema regular expression.
      */
-    public function setPatternMask($patternMask)
+    public function setPatternMask($patternMask): void
     {
         if (is_string($patternMask) === false) {
             throw new InvalidArgumentException(
@@ -212,7 +222,7 @@ class ResponseValidityConstraint extends QtiComponent
      *
      * @return string an XML Schema regulax expression.
      */
-    public function getPatternMask()
+    public function getPatternMask(): string
     {
         return $this->patternMask;
     }
@@ -222,8 +232,9 @@ class ResponseValidityConstraint extends QtiComponent
      *
      * @param AssociationValidityConstraintCollection $associationValidityConstraints
      */
-    public function setAssociationValidityConstraints(AssociationValidityConstraintCollection $associationValidityConstraints)
-    {
+    public function setAssociationValidityConstraints(
+        AssociationValidityConstraintCollection $associationValidityConstraints
+    ): void {
         $this->associationValidityConstraints = $associationValidityConstraints;
     }
 
@@ -232,7 +243,7 @@ class ResponseValidityConstraint extends QtiComponent
      *
      * @return AssociationValidityConstraintCollection
      */
-    public function getAssociationValidityConstraints()
+    public function getAssociationValidityConstraints(): AssociationValidityConstraintCollection
     {
         return $this->associationValidityConstraints;
     }
@@ -242,7 +253,7 @@ class ResponseValidityConstraint extends QtiComponent
      *
      * @param AssociationValidityConstraint $associationValidityConstraint
      */
-    public function addAssociationValidityConstraint(AssociationValidityConstraint $associationValidityConstraint)
+    public function addAssociationValidityConstraint(AssociationValidityConstraint $associationValidityConstraint): void
     {
         $this->getAssociationValidityConstraints()->attach($associationValidityConstraint);
     }
@@ -254,15 +265,16 @@ class ResponseValidityConstraint extends QtiComponent
      *
      * @param AssociationValidityConstraint $associationValidityConstraint
      */
-    public function removeAssociationValidityConstraint(AssociationValidityConstraint $associationValidityConstraint)
-    {
+    public function removeAssociationValidityConstraint(
+        AssociationValidityConstraint $associationValidityConstraint
+    ): void {
         $this->getAssociationValidityConstraints()->remove($associationValidityConstraint);
     }
 
     /**
      * @return string
      */
-    public function getQtiClassName()
+    public function getQtiClassName(): string
     {
         return 'responseValidityConstraint';
     }
@@ -270,10 +282,20 @@ class ResponseValidityConstraint extends QtiComponent
     /**
      * @return QtiComponentCollection
      */
-    public function getComponents()
+    public function getComponents(): QtiComponentCollection
     {
         return new QtiComponentCollection(
             $this->getAssociationValidityConstraints()->getArrayCopy()
         );
+    }
+
+    public function getExtraData(): array
+    {
+        return $this->extraData;
+    }
+
+    public function setExtraData(array $extraData)
+    {
+        $this->extraData = $extraData;
     }
 }

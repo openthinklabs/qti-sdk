@@ -39,7 +39,7 @@ class MathConstantMarshaller extends Marshaller
      * @param QtiComponent $component A MathConstant object.
      * @return DOMElement The according DOMElement object.
      */
-    protected function marshall(QtiComponent $component)
+    protected function marshall(QtiComponent $component): DOMElement
     {
         $element = $this->createElement($component);
 
@@ -52,16 +52,16 @@ class MathConstantMarshaller extends Marshaller
      * Unmarshall a DOMElement object corresponding to a QTI mathConstant element.
      *
      * @param DOMElement $element A DOMElement object.
-     * @return QtiComponent A MathConstant object.
+     * @return MathConstant A MathConstant object.
      * @throws UnmarshallingException If the mandatory attribute 'name' is missing.
      */
-    protected function unmarshall(DOMElement $element)
+    protected function unmarshall(DOMElement $element): MathConstant
     {
         if (($name = $this->getDOMElementAttributeAs($element, 'name')) !== null) {
             if (($cst = MathEnumeration::getConstantByName($name)) !== false) {
                 return new MathConstant($cst);
             } else {
-                $msg = "'${name}' is not a valid value for the attribute 'name' from element '" . $element->localName . "'.";
+                $msg = "'{$name}' is not a valid value for the attribute 'name' from element '" . $element->localName . "'.";
                 throw new UnmarshallingException($msg, $element);
             }
         } else {
@@ -73,7 +73,7 @@ class MathConstantMarshaller extends Marshaller
     /**
      * @return string
      */
-    public function getExpectedQtiClassName()
+    public function getExpectedQtiClassName(): string
     {
         return 'mathConstant';
     }

@@ -40,7 +40,7 @@ class TimeLimitsMarshaller extends Marshaller
      * @param QtiComponent $component A TimeLimits object.
      * @return DOMElement The according DOMElement object.
      */
-    protected function marshall(QtiComponent $component)
+    protected function marshall(QtiComponent $component): DOMElement
     {
         $element = $this->createElement($component);
 
@@ -61,18 +61,18 @@ class TimeLimitsMarshaller extends Marshaller
      * Unmarshall a DOMElement object corresponding to a QTI timeLimits element.
      *
      * @param DOMElement $element A DOMElement object.
-     * @return QtiComponent A TimeLimits object.
+     * @return TimeLimits A TimeLimits object.
      */
-    protected function unmarshall(DOMElement $element)
+    protected function unmarshall(DOMElement $element): TimeLimits
     {
         $object = new TimeLimits();
 
         if (($value = $this->getDOMElementAttributeAs($element, 'minTime', 'string')) !== null) {
-            $object->setMinTime(StorageUtils::stringToDatatype("PT${value}S", BaseType::DURATION));
+            $object->setMinTime(StorageUtils::stringToDatatype("PT{$value}S", BaseType::DURATION));
         }
 
         if (($value = $this->getDOMElementAttributeAs($element, 'maxTime', 'string')) !== null) {
-            $object->setMaxTime(StorageUtils::stringToDatatype("PT${value}S", BaseType::DURATION));
+            $object->setMaxTime(StorageUtils::stringToDatatype("PT{$value}S", BaseType::DURATION));
         }
 
         if (($value = $this->getDOMElementAttributeAs($element, 'allowLateSubmission', 'boolean')) !== null) {
@@ -85,7 +85,7 @@ class TimeLimitsMarshaller extends Marshaller
     /**
      * @return string
      */
-    public function getExpectedQtiClassName()
+    public function getExpectedQtiClassName(): string
     {
         return 'timeLimits';
     }

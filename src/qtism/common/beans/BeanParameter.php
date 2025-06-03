@@ -51,7 +51,7 @@ class BeanParameter
         try {
             $this->setParameter(new ReflectionParameter([$class, $method], $name));
         } catch (ReflectionException $e) {
-            $msg = "No such parameter '${name}' for method '${method}' of class '${class}'.";
+            $msg = "No such parameter '{$name}' for method '{$method}' of class '{$class}'.";
             throw new BeanException($msg, BeanException::NO_PARAMETER, $e);
         }
     }
@@ -61,7 +61,7 @@ class BeanParameter
      *
      * @param ReflectionParameter $parameter A ReflectionParameter object.
      */
-    protected function setParameter(ReflectionParameter $parameter)
+    protected function setParameter(ReflectionParameter $parameter): void
     {
         $this->parameter = $parameter;
     }
@@ -71,7 +71,7 @@ class BeanParameter
      *
      * @return ReflectionParameter A ReflectionParameter object.
      */
-    public function getParameter()
+    public function getParameter(): ReflectionParameter
     {
         return $this->parameter;
     }
@@ -81,7 +81,7 @@ class BeanParameter
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->getParameter()->getName();
     }

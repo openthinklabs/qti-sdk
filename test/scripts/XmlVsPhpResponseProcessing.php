@@ -10,7 +10,7 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
  * @param $end
  * @return mixed
  */
-function spentTime($start, $end)
+function spentTime($start, $end): mixed
 {
     $startTime = explode(' ', $start);
     $endTime = explode(' ', $end);
@@ -61,5 +61,5 @@ foreach ($templates as $t) {
     }
     $meanPhp = $meanPhp / $iterations;
 
-    echo "+ ${t} (XML = ${meanXml} - PHP ${meanPhp})\n";
+    echo "+ {$t} (XML = {$meanXml} - PHP {$meanPhp})\n";
 }

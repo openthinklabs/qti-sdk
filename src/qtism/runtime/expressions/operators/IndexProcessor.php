@@ -48,6 +48,7 @@ class IndexProcessor extends OperatorProcessor
      * @return mixed|null A QTIRuntime compliant scalar value. NULL is returned if expression->n exceeds the number of values in the container or the sub-expression is NULL.
      * @throws OperatorProcessingException
      */
+    #[\ReturnTypeWillChange]
     public function process()
     {
         $operands = $this->getOperands();
@@ -69,17 +70,17 @@ class IndexProcessor extends OperatorProcessor
                 if ($index instanceof QtiInteger) {
                     $n = $index->getValue();
                 } else {
-                    $msg = "The value '${index}' is not an integer. Ordered containers can be only accessed by integers.";
+                    $msg = "The value '{$index}' is not an integer. Ordered containers can be only accessed by integers.";
                     throw new OperatorProcessingException($msg, $this, OperatorProcessingException::WRONG_VARIABLE_BASETYPE);
                 }
             } else {
-                $msg = "Unknown variable reference '${n}'.";
+                $msg = "Unknown variable reference '{$n}'.";
                 throw new OperatorProcessingException($msg, $this, OperatorProcessingException::NONEXISTENT_VARIABLE);
             }
         }
 
         if ($n < 1) {
-            $msg = "The value of 'n' must be a non-zero postive integer, '${n}' given.";
+            $msg = "The value of 'n' must be a non-zero postive integer, '{$n}' given.";
             throw new OperatorProcessingException($msg, $this, OperatorProcessingException::LOGIC_ERROR);
         }
 
@@ -96,7 +97,7 @@ class IndexProcessor extends OperatorProcessor
     /**
      * @return string
      */
-    protected function getExpressionType()
+    protected function getExpressionType(): string
     {
         return Index::class;
     }

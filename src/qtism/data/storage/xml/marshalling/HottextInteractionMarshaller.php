@@ -42,7 +42,7 @@ class HottextInteractionMarshaller extends ContentMarshaller
      * @throws MarshallerNotFoundException
      * @throws UnmarshallingException
      */
-    protected function unmarshallChildrenKnown(DOMElement $element, QtiComponentCollection $children)
+    protected function unmarshallChildrenKnown(DOMElement $element, QtiComponentCollection $children): QtiComponent
     {
         $version = $this->getVersion();
 
@@ -58,7 +58,7 @@ class HottextInteractionMarshaller extends ContentMarshaller
             try {
                 $component = new $fqClass($responseIdentifier, $content);
             } catch (InvalidArgumentException $e) {
-                $msg = "The value '${responseIdentifier}' for the attribute 'responseIdentifier' for element 'hottextInteraction' is not a valid QTI identifier.";
+                $msg = "The value '{$responseIdentifier}' for the attribute 'responseIdentifier' for element 'hottextInteraction' is not a valid QTI identifier.";
                 throw new UnmarshallingException($msg, $element, $e);
             }
 
@@ -97,7 +97,7 @@ class HottextInteractionMarshaller extends ContentMarshaller
      * @throws MarshallerNotFoundException
      * @throws MarshallingException
      */
-    protected function marshallChildrenKnown(QtiComponent $component, array $elements)
+    protected function marshallChildrenKnown(QtiComponent $component, array $elements): DOMElement
     {
         $version = $this->getVersion();
         $element = $this->createElement($component);
@@ -127,7 +127,7 @@ class HottextInteractionMarshaller extends ContentMarshaller
         return $element;
     }
 
-    protected function setLookupClasses()
+    protected function setLookupClasses(): void
     {
         $this->lookupClasses = ["qtism\\data\\content\\interactions"];
     }

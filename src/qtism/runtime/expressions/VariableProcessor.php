@@ -134,7 +134,7 @@ class VariableProcessor extends ExpressionProcessor
                 }
             } catch (InvalidArgumentException $e) {
                 // Invalid $variableIdentifier.
-                $msg = "Invalid identifier '${variableIdentifier}' given for variable identifier.";
+                $msg = "Invalid identifier '{$variableIdentifier}' given for variable identifier.";
                 throw new ExpressionProcessingException($msg, $this, ExpressionProcessingException::NONEXISTENT_VARIABLE, $e);
             }
         } else {
@@ -145,7 +145,7 @@ class VariableProcessor extends ExpressionProcessor
     /**
      * @return string
      */
-    protected function getExpressionType()
+    protected function getExpressionType(): string
     {
         return Variable::class;
     }

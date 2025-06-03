@@ -61,7 +61,7 @@ class FileSystemFile implements QtiFile
      *
      * @var int
      */
-    const CHUNK_SIZE = 2048;
+    public const CHUNK_SIZE = 2048;
 
     /**
      * Create a new PersistentFile object.
@@ -78,7 +78,7 @@ class FileSystemFile implements QtiFile
     /**
      * @param $path
      */
-    private function readInfo($path)
+    private function readInfo($path): void
     {
         // Retrieve filename and mime type.
         $fp = @fopen($path, 'r');
@@ -107,7 +107,7 @@ class FileSystemFile implements QtiFile
      *
      * @param string $path
      */
-    protected function setPath($path)
+    protected function setPath($path): void
     {
         $this->path = $path;
     }
@@ -117,7 +117,7 @@ class FileSystemFile implements QtiFile
      *
      * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
@@ -127,7 +127,7 @@ class FileSystemFile implements QtiFile
      *
      * @param string $mimeType
      */
-    protected function setMimeType($mimeType)
+    protected function setMimeType($mimeType): void
     {
         $this->mimeType = $mimeType;
     }
@@ -137,7 +137,7 @@ class FileSystemFile implements QtiFile
      *
      * @return string
      */
-    public function getMimeType()
+    public function getMimeType(): string
     {
         return $this->mimeType;
     }
@@ -147,7 +147,7 @@ class FileSystemFile implements QtiFile
      *
      * @return string
      */
-    public function getFilename()
+    public function getFilename(): string
     {
         return $this->filename;
     }
@@ -157,7 +157,7 @@ class FileSystemFile implements QtiFile
      *
      * @param string $filename
      */
-    protected function setFilename($filename)
+    protected function setFilename($filename): void
     {
         $this->filename = $filename;
     }
@@ -167,7 +167,7 @@ class FileSystemFile implements QtiFile
      *
      * @throws RuntimeException If the data cannot be retrieved.
      */
-    public function getData()
+    public function getData(): string
     {
         $fp = $this->getStream();
         $data = '';
@@ -211,22 +211,25 @@ class FileSystemFile implements QtiFile
      * @param string $source The source path.
      * @param string $destination Where the file resulting from $source will be stored.
      * @param string $mimeType The MIME type of the file.
-     * @param mixed $withFilename Whether or not consider the $source's filename to be the $destination's file name. Give true to use the current file name. Give a string to select a different one. Default is true.
+     * @param mixed $withFilename Whether consider the $source's filename to be the $destination's file name. Give true to use the current file name. Give a string to select a different one. Default is true.
      * @return FileSystemFile
      * @throws RuntimeException If something wrong happens.
      */
-    public static function createFromExistingFile($source, $destination, $mimeType, $withFilename = true)
+    public static function createFromExistingFile($source, $destination, $mimeType, $withFilename = true): FileSystemFile
     {
         if (is_file($source)) {
             if (is_readable($source)) {
                 // Should we build the path to $destination?
                 $pathinfo = pathinfo($destination);
                 if (isset($pathinfo['dirname']) === false) {
-                    $msg = "The destination argument '${destination}' is a malformed path.";
+                    $msg = "The destination argument '{$destination}' is a malformed path.";
                     throw new RuntimeException($msg);
                 }
 
-                if ((is_dir($pathinfo['dirname']) === false) && ($mkdir = @mkdir($pathinfo['dirname'], '0770', true)) === false) {
+                if (
+                    is_dir($pathinfo['dirname']) === false
+                    && ($mkdir = @mkdir($pathinfo['dirname'], 0770, true)) === false
+                ) {
                     $msg = "Unable to create destination directory at '" . $pathinfo['dirname'] . "'.";
                     throw new RuntimeException($msg);
                 }
@@ -248,12 +251,12 @@ class FileSystemFile implements QtiFile
 
                 $sourceFp = @fopen($source, 'r');
                 if ($sourceFp === false) {
-                    throw new RuntimeException("Source file '${source}' could not be open.");
+                    throw new RuntimeException("Source file '{$source}' could not be open.");
                 }
 
                 $destinationFp = @fopen($destination, 'w');
                 if ($destinationFp === false) {
-                    throw new RuntimeException("Destination file '${destination}' could not be open.");
+                    throw new RuntimeException("Destination file '{$destination}' could not be open.");
                 }
 
                 fwrite($destinationFp, $packedFilename . $packedMimeType);
@@ -270,12 +273,12 @@ class FileSystemFile implements QtiFile
                 return new static($destination);
             } else {
                 // Source file not readable.
-                $msg = "File '${source}' found but not readable.";
+                $msg = "File '{$source}' found but not readable.";
                 throw new RuntimeException($msg);
             }
         } else {
             // Source file not found.
-            $msg = "Unable to find source file at '${source}'.";
+            $msg = "Unable to find source file at '{$source}'.";
             throw new RuntimeException($msg);
         }
     }
@@ -289,7 +292,7 @@ class FileSystemFile implements QtiFile
      * @param string $filename
      * @return FileSystemFile
      */
-    public static function createFromData($data, $destination, $mimeType, $filename = '')
+    public static function createFromData($data, $destination, $mimeType, $filename = ''): FileSystemFile
     {
         $tmp = tempnam('/tmp', 'qtism');
         file_put_contents($tmp, $data);
@@ -307,7 +310,7 @@ class FileSystemFile implements QtiFile
      * @return FileSystemFile
      * @throws RuntimeException If something wrong occurs while retrieving the file.
      */
-    public static function retrieveFile($path)
+    public static function retrieveFile($path): FileSystemFile
     {
         return new static($path);
     }
@@ -317,7 +320,7 @@ class FileSystemFile implements QtiFile
      *
      * @return int A value from the Cardinality enumeration.
      */
-    public function getCardinality()
+    public function getCardinality(): int
     {
         return Cardinality::SINGLE;
     }
@@ -327,17 +330,17 @@ class FileSystemFile implements QtiFile
      *
      * @return int A value from the BaseType enumeration.
      */
-    public function getBaseType()
+    public function getBaseType(): int
     {
         return BaseType::FILE;
     }
 
     /**
-     * Whether or not the File has a file name.
+     * Whether the File has a file name.
      *
      * @return bool
      */
-    public function hasFilename()
+    public function hasFilename(): bool
     {
         return $this->getFilename() !== '';
     }
@@ -350,7 +353,7 @@ class FileSystemFile implements QtiFile
      * @param mixed $obj
      * @return bool
      */
-    public function equals($obj)
+    public function equals($obj): bool
     {
         if ($obj instanceof QtiFile) {
             if ($this->getFilename() !== $obj->getFilename()) {
@@ -389,7 +392,7 @@ class FileSystemFile implements QtiFile
      *
      * @return string
      */
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return $this->getPath();
     }
@@ -401,7 +404,7 @@ class FileSystemFile implements QtiFile
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getFilename();
     }

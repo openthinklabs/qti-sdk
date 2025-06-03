@@ -59,15 +59,15 @@ abstract class OperatorProcessor extends ExpressionProcessor
      * @param OperandsCollection $operands A collection of QTI Runtime compliant values.
      * @throws OperatorProcessingException If The operands are not compliant with minimum or maximum amount of operands the operator can take.
      */
-    public function setOperands(OperandsCollection $operands)
+    public function setOperands(OperandsCollection $operands): void
     {
         // Check minimal operand count.
         $min = $this->getExpression()->getMinOperands();
         $given = count($operands);
 
         if ($given < $min) {
-            $msg = "The Operator to be processed '" . get_class($this) . "' requires at least ${min} operand(s). ";
-            $msg .= "${given} operand(s) given.";
+            $msg = "The Operator to be processed '" . get_class($this) . "' requires at least {$min} operand(s). ";
+            $msg .= "{$given} operand(s) given.";
             throw new OperatorProcessingException($msg, $this, OperatorProcessingException::NOT_ENOUGH_OPERANDS);
         }
 
@@ -76,8 +76,8 @@ abstract class OperatorProcessor extends ExpressionProcessor
         $given = count($operands);
 
         if ($max !== -1 && $given > $max) {
-            $msg = "The Operator to be processed '" . get_class($this) . "' requires at most ${max} operand(s). ";
-            $msg .= "${given} operand(s) given.";
+            $msg = "The Operator to be processed '" . get_class($this) . "' requires at most {$max} operand(s). ";
+            $msg .= "{$given} operand(s) given.";
             throw new OperatorProcessingException($msg, $this, OperatorProcessingException::TOO_MUCH_OPERANDS);
         }
 
@@ -90,7 +90,7 @@ abstract class OperatorProcessor extends ExpressionProcessor
      *
      * @return OperandsCollection A collection of QTI Runtime compliant values.
      */
-    public function getOperands()
+    public function getOperands(): OperandsCollection
     {
         return $this->operands;
     }

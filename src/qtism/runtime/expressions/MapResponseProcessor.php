@@ -62,7 +62,7 @@ class MapResponseProcessor extends ExpressionProcessor
      * @return QtiFloat a QTI float value.
      * @throws ExpressionProcessingException
      */
-    public function process()
+    public function process(): QtiFloat
     {
         $expr = $this->getExpression();
         $state = $this->getState();
@@ -161,7 +161,7 @@ class MapResponseProcessor extends ExpressionProcessor
                 throw new ExpressionProcessingException($msg, $this, ExpressionProcessingException::WRONG_VARIABLE_TYPE);
             }
         } else {
-            $msg = "No variable with identifier '${identifier}' could be found while processing MapResponse.";
+            $msg = "No variable with identifier '{$identifier}' could be found while processing MapResponse.";
             throw new ExpressionProcessingException($msg, $this, ExpressionProcessingException::NONEXISTENT_VARIABLE);
         }
     }
@@ -169,7 +169,7 @@ class MapResponseProcessor extends ExpressionProcessor
     /**
      * @return string
      */
-    protected function getExpressionType()
+    protected function getExpressionType(): string
     {
         return MapResponse::class;
     }

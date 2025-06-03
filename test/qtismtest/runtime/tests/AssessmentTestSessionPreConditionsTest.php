@@ -16,7 +16,7 @@ use qtismtest\QtiSmAssessmentTestSessionTestCase;
  */
 class AssessmentTestSessionPreConditionsTest extends QtiSmAssessmentTestSessionTestCase
 {
-    public function testInstantiationSample1()
+    public function testInstantiationSample1(): void
     {
         $testSession = self::instantiate(self::samplesDir() . 'custom/runtime/preconditions/preconditions_single_section_linear.xml');
         $route = $testSession->getRoute();
@@ -47,7 +47,7 @@ class AssessmentTestSessionPreConditionsTest extends QtiSmAssessmentTestSessionT
         $this::assertEquals('Q03.SCORE', $var[0]->getIdentifier());
     }
 
-    public function testSingleSectionLinear1()
+    public function testSingleSectionLinear1(): void
     {
         $testSession = self::instantiate(self::samplesDir() . 'custom/runtime/preconditions/preconditions_single_section_linear.xml');
         $testSession->beginTestSession();
@@ -66,7 +66,7 @@ class AssessmentTestSessionPreConditionsTest extends QtiSmAssessmentTestSessionT
         $this::assertNull($testSession['Q04.SCORE']);
     }
 
-    public function testSingleSectionNonLinear1()
+    public function testSingleSectionNonLinear1(): void
     {
         // This test aims at checking that preconditions are by default ignored when
         // the navigation mode is non linear.
@@ -84,7 +84,7 @@ class AssessmentTestSessionPreConditionsTest extends QtiSmAssessmentTestSessionT
         $this::assertEquals('Q02', $testSession->getCurrentAssessmentItemRef()->getIdentifier());
     }
 
-    public function testSingleSectionNonLinearForcePreconditions()
+    public function testSingleSectionNonLinearForcePreconditions(): void
     {
         // This test aims at testing that when forcing preconditions is in force,
         // they are executed even if the current navigation mode is non linear.
@@ -105,7 +105,7 @@ class AssessmentTestSessionPreConditionsTest extends QtiSmAssessmentTestSessionT
         $this::assertNull($testSession['Q04.SCORE']);
     }
 
-    public function testKillerTestEpicFail()
+    public function testKillerTestEpicFail(): void
     {
         $testSession = self::instantiate(self::samplesDir() . 'custom/runtime/preconditions/preconditions_killertest.xml');
         $testSession->beginTestSession();
@@ -126,7 +126,7 @@ class AssessmentTestSessionPreConditionsTest extends QtiSmAssessmentTestSessionT
         $this::assertNull($testSession['Q05.SCORE']);
     }
 
-    public function testKillerTestEpicWin()
+    public function testKillerTestEpicWin(): void
     {
         $testSession = self::instantiate(self::samplesDir() . 'custom/runtime/preconditions/preconditions_killertest.xml');
         $testSession->beginTestSession();
@@ -162,5 +162,36 @@ class AssessmentTestSessionPreConditionsTest extends QtiSmAssessmentTestSessionT
         $this::assertEquals(1.0, $testSession['Q05.SCORE']->getValue());
 
         $this::assertFalse($testSession->isRunning());
+    }
+
+    public function testTestParAndSectionAndItemPreConditionOnLinearTestWorks(): void
+    {
+        $testSession = self::instantiate(self::samplesDir() . 'custom/runtime/preconditions/preconditions_on_test_part_section_item_combined_linear.xml');
+        $testSession->beginTestSession();
+        $testSession->beginAttempt();
+        $testSession->moveNext();
+
+        // P02, S03, Q04 are skipped due precondition, but Q04.1 is passed
+        $this::assertSame($testSession->getRoute()->current()->getAssessmentItemRef()->getIdentifier(), 'Q04.1');
+
+        $testSession->moveNext();
+
+        // P05 precondition passed
+        $this::assertSame($testSession->getRoute()->current()->getAssessmentItemRef()->getIdentifier(), 'Q05');
+
+        $testSession->moveNext();
+
+        // S06 precondition passed
+        $this::assertSame($testSession->getRoute()->current()->getAssessmentItemRef()->getIdentifier(), 'Q06');
+
+        $testSession->moveNext();
+
+        // S07 precondition passed
+        $this::assertSame($testSession->getRoute()->current()->getAssessmentItemRef()->getIdentifier(), 'Q07');
+
+        $testSession->moveNext();
+
+        // P08 is nonlinear, but it will be skipped, cause pre-conditions apply to non-linear test parts
+        $this::assertSame($testSession->getRoute()->current()->getAssessmentItemRef()->getIdentifier(), 'Q09');
     }
 }

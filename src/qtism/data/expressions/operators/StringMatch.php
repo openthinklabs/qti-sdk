@@ -40,7 +40,7 @@ class StringMatch extends Operator
     /**
      * From IMS QTI:
      *
-     * Whether or not the match is to be carried out case sensitively.
+     * Whether the match is to be carried out case sensitively.
      *
      * @var bool
      * @qtism-bean-property
@@ -63,7 +63,7 @@ class StringMatch extends Operator
      * Create a new instance of StringMatch.
      *
      * @param ExpressionCollection $expressions A collection of Expression objects.
-     * @param bool $caseSensitive Whether or not the match to be carried out case sensitively.
+     * @param bool $caseSensitive Whether the match to be carried out case sensitively.
      * @param bool $substring Deprecated argument, use the substring operator instead.
      * @throws InvalidArgumentException If $caseSensitive or $substring are not booleans or if the $expressions count is greather than 2.
      */
@@ -75,12 +75,12 @@ class StringMatch extends Operator
     }
 
     /**
-     * Set Whether or not the match is to be carried out case sensitively.
+     * Set Whether the match is to be carried out case sensitively.
      *
      * @param bool $caseSensitive Case sensitiveness.
      * @throws InvalidArgumentException If $caseSensitive is not a boolean.
      */
-    public function setCaseSensitive($caseSensitive)
+    public function setCaseSensitive($caseSensitive): void
     {
         if (is_bool($caseSensitive)) {
             $this->caseSensitive = $caseSensitive;
@@ -95,7 +95,7 @@ class StringMatch extends Operator
      *
      * @return bool True if it has to, false otherwise.
      */
-    public function isCaseSensitive()
+    public function isCaseSensitive(): bool
     {
         return $this->caseSensitive;
     }
@@ -107,7 +107,7 @@ class StringMatch extends Operator
      * @throws InvalidArgumentException If $substring is not a boolean.
      * @deprecated
      */
-    public function setSubstring($substring)
+    public function setSubstring($substring): void
     {
         if (is_bool($substring)) {
             $this->substring = $substring;
@@ -123,7 +123,7 @@ class StringMatch extends Operator
      * @return bool
      * @deprecated
      */
-    public function mustSubstring()
+    public function mustSubstring(): bool
     {
         return $this->substring;
     }
@@ -131,7 +131,7 @@ class StringMatch extends Operator
     /**
      * @return string
      */
-    public function getQtiClassName()
+    public function getQtiClassName(): string
     {
         return 'stringMatch';
     }

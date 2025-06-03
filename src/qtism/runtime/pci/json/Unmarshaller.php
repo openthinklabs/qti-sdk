@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014-2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2022 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  * @author Jérôme Bogaerts <jerome@taotesting.com>
  * @license GPLv2
@@ -81,7 +81,7 @@ class Unmarshaller
      *
      * @param FileManager $fileManager A FileManager object.
      */
-    protected function setFileManager(FileManager $fileManager)
+    protected function setFileManager(FileManager $fileManager): void
     {
         $this->fileManager = $fileManager;
     }
@@ -92,7 +92,7 @@ class Unmarshaller
      *
      * @return FileManager A FileManager object.
      */
-    protected function getFileManager()
+    protected function getFileManager(): FileManager
     {
         return $this->fileManager;
     }
@@ -138,7 +138,7 @@ class Unmarshaller
             throw new UnmarshallingException($msg, $code);
         }
 
-        // Check whether or not $json is a state (no 'base' nor 'list' keys found),
+        // Check whether $json is a state (no 'base' nor 'list' keys found),
         // a base, a list or a record.
         $keys = array_keys($json);
 
@@ -193,7 +193,7 @@ class Unmarshaller
      * @throws FileManagerException
      * @throws UnmarshallingException
      */
-    protected function unmarshallUnit(array $unit)
+    protected function unmarshallUnit(array $unit): ?QtiDatatype
     {
         if ($unit['base'] === null) {
             return null;
@@ -205,59 +205,45 @@ class Unmarshaller
             switch ($keys[0]) {
                 case 'boolean':
                     return $this->unmarshallBoolean($unit);
-                    break;
 
                 case 'integer':
                     return $this->unmarshallInteger($unit);
-                    break;
 
                 case 'float':
                     return $this->unmarshallFloat($unit);
-                    break;
 
                 case 'string':
                     return $this->unmarshallString($unit);
-                    break;
 
                 case 'point':
                     return $this->unmarshallPoint($unit);
-                    break;
 
                 case 'pair':
                     return $this->unmarshallPair($unit);
-                    break;
 
                 case 'directedPair':
                     return $this->unmarshallDirectedPair($unit);
-                    break;
 
                 case 'duration':
                     return $this->unmarshallDuration($unit);
-                    break;
 
                 case 'file':
                     return $this->unmarshallFile($unit);
-                    break;
 
                 case FileHash::FILE_HASH_KEY:
                     return $this->unmarshallFileHash($unit);
-                    break;
 
                 case 'uri':
                     return $this->unmarshallUri($unit);
-                    break;
 
                 case 'intOrIdentifier':
                     return $this->unmarshallIntOrIdentifier($unit);
-                    break;
 
                 case 'identifier':
                     return $this->unmarshallIdentifier($unit);
-                    break;
 
                 default:
                     throw new UnmarshallingException("Unknown QTI baseType '" . $keys[0] . "'");
-                    break;
             }
         } catch (InvalidArgumentException $e) {
             $msg = 'A value does not satisfy its baseType.';
@@ -271,7 +257,7 @@ class Unmarshaller
      * @param array $unit
      * @return QtiBoolean
      */
-    protected function unmarshallBoolean(array $unit)
+    protected function unmarshallBoolean(array $unit): QtiBoolean
     {
         return new QtiBoolean($unit['base']['boolean']);
     }
@@ -282,7 +268,7 @@ class Unmarshaller
      * @param array $unit
      * @return QtiInteger
      */
-    protected function unmarshallInteger(array $unit)
+    protected function unmarshallInteger(array $unit): QtiInteger
     {
         return new QtiInteger($unit['base']['integer']);
     }
@@ -293,7 +279,7 @@ class Unmarshaller
      * @param array $unit
      * @return QtiFloat
      */
-    protected function unmarshallFloat(array $unit)
+    protected function unmarshallFloat(array $unit): QtiFloat
     {
         $val = $unit['base']['float'];
 
@@ -310,7 +296,7 @@ class Unmarshaller
      * @param array $unit
      * @return QtiString
      */
-    protected function unmarshallString(array $unit)
+    protected function unmarshallString(array $unit): QtiString
     {
         return new QtiString($unit['base']['string']);
     }
@@ -321,7 +307,7 @@ class Unmarshaller
      * @param array $unit
      * @return QtiPoint
      */
-    protected function unmarshallPoint(array $unit)
+    protected function unmarshallPoint(array $unit): QtiPoint
     {
         return new QtiPoint($unit['base']['point'][0], $unit['base']['point'][1]);
     }
@@ -332,7 +318,7 @@ class Unmarshaller
      * @param array $unit
      * @return QtiPair
      */
-    protected function unmarshallPair(array $unit)
+    protected function unmarshallPair(array $unit): QtiPair
     {
         return new QtiPair($unit['base']['pair'][0], $unit['base']['pair'][1]);
     }
@@ -343,7 +329,7 @@ class Unmarshaller
      * @param array $unit
      * @return QtiDirectedPair
      */
-    protected function unmarshallDirectedPair(array $unit)
+    protected function unmarshallDirectedPair(array $unit): QtiDirectedPair
     {
         return new QtiDirectedPair($unit['base']['directedPair'][0], $unit['base']['directedPair'][1]);
     }
@@ -354,7 +340,7 @@ class Unmarshaller
      * @param array $unit
      * @return QtiDuration
      */
-    protected function unmarshallDuration(array $unit)
+    protected function unmarshallDuration(array $unit): QtiDuration
     {
         return new QtiDuration($unit['base']['duration']);
     }
@@ -366,13 +352,14 @@ class Unmarshaller
      * @return QtiFile
      * @throws FileManagerException
      */
-    protected function unmarshallFile(array $unit)
+    protected function unmarshallFile(array $unit): QtiFile
     {
         $fileArray = $unit['base']['file'];
         return $this->getFileManager()->createFromData(
             base64_decode($fileArray['data']),
             $fileArray['mime'],
-            $fileArray['name'] ?? ''
+            $fileArray['name'] ?? '',
+            $fileArray['path'] ?? null
         );
     }
 
@@ -390,7 +377,7 @@ class Unmarshaller
      * @return QtiFile
      * @throws FileManagerException
      */
-    protected function unmarshallFileHash(array $unit)
+    protected function unmarshallFileHash(array $unit): QtiFile
     {
         $fileHashArray = $unit['base'][FileHash::FILE_HASH_KEY];
         if (empty($fileHashArray['id'])) {
@@ -411,7 +398,7 @@ class Unmarshaller
      * @param array $unit
      * @return QtiUri
      */
-    protected function unmarshallUri(array $unit)
+    protected function unmarshallUri(array $unit): QtiUri
     {
         return new QtiUri($unit['base']['uri']);
     }
@@ -422,7 +409,7 @@ class Unmarshaller
      * @param array $unit
      * @return QtiIntOrIdentifier
      */
-    protected function unmarshallIntOrIdentifier(array $unit)
+    protected function unmarshallIntOrIdentifier(array $unit): QtiIntOrIdentifier
     {
         return new QtiIntOrIdentifier($unit['base']['intOrIdentifier']);
     }
@@ -433,7 +420,7 @@ class Unmarshaller
      * @param array $unit
      * @return QtiIdentifier
      */
-    protected function unmarshallIdentifier(array $unit)
+    protected function unmarshallIdentifier(array $unit): QtiIdentifier
     {
         return new QtiIdentifier($unit['base']['identifier']);
     }
@@ -447,7 +434,7 @@ class Unmarshaller
      * @throws FileManagerException
      * @throws UnmarshallingException
      */
-    protected function unmarshallList(array $parsedJson)
+    protected function unmarshallList(array $parsedJson): MultipleContainer
     {
         $list = $parsedJson['list'];
         $key = key($list);
@@ -481,7 +468,7 @@ class Unmarshaller
                 }
             } catch (InvalidArgumentException $e) {
                 $strBaseType = BaseType::getNameByConstant($baseType);
-                $msg = "A value is not compliant with the '${strBaseType}' baseType.";
+                $msg = "A value is not compliant with the '{$strBaseType}' baseType.";
                 $code = UnmarshallingException::NOT_PCI;
                 throw new UnmarshallingException($msg, $code);
             }

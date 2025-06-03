@@ -71,12 +71,12 @@ class QtiPair implements QtiDatatype
      * @param string $first A QTI Identifier.
      * @throws InvalidArgumentException If $first is an invalid QTI Identifier.
      */
-    public function setFirst($first)
+    public function setFirst($first): void
     {
         if (Format::isIdentifier($first)) {
             $this->first = $first;
         } else {
-            $msg = "'${first}' is an invalid QTI identifier.";
+            $msg = "'{$first}' is an invalid QTI identifier.";
             throw new InvalidArgumentException($msg);
         }
     }
@@ -86,7 +86,7 @@ class QtiPair implements QtiDatatype
      *
      * @return string A QTI Identifier.
      */
-    public function getFirst()
+    public function getFirst(): string
     {
         return $this->first;
     }
@@ -97,12 +97,12 @@ class QtiPair implements QtiDatatype
      * @param string $second A QTI Identifier.
      * @throws InvalidArgumentException If $identifier is not a valid QTI Identifier.
      */
-    public function setSecond($second)
+    public function setSecond($second): void
     {
         if (Format::isIdentifier($second)) {
             $this->second = $second;
         } else {
-            $msg = "'${second}' is an invalid QTI identifier.";
+            $msg = "'{$second}' is an invalid QTI identifier.";
             throw new InvalidArgumentException($msg);
         }
     }
@@ -112,7 +112,7 @@ class QtiPair implements QtiDatatype
      *
      * @return string A QTI Identifier.
      */
-    public function getSecond()
+    public function getSecond(): string
     {
         return $this->second;
     }
@@ -122,7 +122,7 @@ class QtiPair implements QtiDatatype
      *
      * @return string The serialized version of the Pair.
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getFirst() . ' ' . $this->getSecond();
     }
@@ -133,9 +133,9 @@ class QtiPair implements QtiDatatype
      * of $obj are the same as the ones of $obj.
      *
      * @param mixed $obj A value to compare.
-     * @return bool Whether or not the equality could be established.
+     * @return bool Whether the equality could be established.
      */
-    public function equals($obj)
+    public function equals($obj): bool
     {
         if (is_object($obj) && $obj instanceof self) {
             $a = [$this->getFirst(), $this->getSecond()];
@@ -153,7 +153,7 @@ class QtiPair implements QtiDatatype
      *
      * @return int A value from the BaseType enumeration.
      */
-    public function getBaseType()
+    public function getBaseType(): int
     {
         return BaseType::PAIR;
     }
@@ -164,7 +164,7 @@ class QtiPair implements QtiDatatype
      *
      * @return int A value from the Cardinality enumeration.
      */
-    public function getCardinality()
+    public function getCardinality(): int
     {
         return Cardinality::SINGLE;
     }

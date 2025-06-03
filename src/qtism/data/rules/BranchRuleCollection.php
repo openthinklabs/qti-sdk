@@ -31,13 +31,27 @@ use qtism\data\QtiComponentCollection;
  */
 class BranchRuleCollection extends QtiComponentCollection
 {
+
+    /** @var bool */
+    private $allowNonLinearNavigationMode = false;
+
+    public function isNonLinearNavigationModeAllowed(): bool
+    {
+        return $this->allowNonLinearNavigationMode;
+    }
+
+    public function allowNonLinearNavigationMode(): void
+    {
+        $this->allowNonLinearNavigationMode = true;
+    }
+
     /**
      * Check if a given $value is an instance of BranchRule.
      *
      * @param mixed $value
      * @throws InvalidArgumentException If the given $value is not an instance of BranchRule.
      */
-    protected function checkType($value)
+    protected function checkType($value): void
     {
         if (!$value instanceof BranchRule) {
             $msg = "BranchRuleCollection only accepts to store BranchRule objects, '" . gettype($value) . "' given.";

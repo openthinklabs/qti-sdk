@@ -37,6 +37,7 @@ class RandomFloat extends Expression
      * The min attribute value.
      *
      * @var float
+     * @qtism-bean-property
      */
     private $min = 0.0;
 
@@ -77,7 +78,7 @@ class RandomFloat extends Expression
      * @param number|string $min A float value, int value or a variableRef.
      * @throws InvalidArgumentException If $min is not a numeric value nor a variableRef.
      */
-    public function setMin($min)
+    public function setMin($min): void
     {
         if (is_numeric($min) || Format::isVariableRef($min)) {
             $this->min = $min;
@@ -103,7 +104,7 @@ class RandomFloat extends Expression
      * @param number|string $max A numeric value or a variableRef.
      * @throws InvalidArgumentException If $max is not a numeric value nor a variableRef.
      */
-    public function setMax($max)
+    public function setMax($max): void
     {
         if (is_numeric($max) || Format::isVariableRef($max)) {
             $this->max = $max;
@@ -116,7 +117,7 @@ class RandomFloat extends Expression
     /**
      * @return string
      */
-    public function getQtiClassName()
+    public function getQtiClassName(): string
     {
         return 'randomFloat';
     }
@@ -126,7 +127,7 @@ class RandomFloat extends Expression
      *
      * @return bool
      */
-    public function isPure()
+    public function isPure(): bool
     {
         return false; // Random --> impure
     }

@@ -43,7 +43,7 @@ class FeedbackElementMarshaller extends ContentMarshaller
      * @return mixed
      * @throws UnmarshallingException
      */
-    protected function unmarshallChildrenKnown(DOMElement $element, QtiComponentCollection $children)
+    protected function unmarshallChildrenKnown(DOMElement $element, QtiComponentCollection $children): QtiComponent
     {
         $fqClass = $this->lookupClass($element);
 
@@ -55,7 +55,7 @@ class FeedbackElementMarshaller extends ContentMarshaller
                     try {
                         $component->setShowHide(ShowHide::getConstantByName($showHide));
                     } catch (InvalidArgumentException $e) {
-                        $msg = "'${showHide}' is not a valid value for the 'showHide' attribute of element '" . $element->localName . "'.";
+                        $msg = "'{$showHide}' is not a valid value for the 'showHide' attribute of element '" . $element->localName . "'.";
                         throw new UnmarshallingException($msg, $element, $e);
                     }
 
@@ -65,11 +65,11 @@ class FeedbackElementMarshaller extends ContentMarshaller
                     foreach ($children as $child) {
                         $qtiClassName = $child->getQtiClassName();
                         if ($inline === false && !$child instanceof Flow) {
-                            $msg = "A '${qtiClassName}' cannot be contained by a 'feedbackBlock'.";
+                            $msg = "A '{$qtiClassName}' cannot be contained by a 'feedbackBlock'.";
                             throw new UnmarshallingException($msg, $element);
                         }
                         if ($inline === false && in_array($child->getQtiClassName(), $blockExclusion)) {
-                            $msg = "A '${qtiClassName}' cannot be contained by a 'feedbackBlock'.";
+                            $msg = "A '{$qtiClassName}' cannot be contained by a 'feedbackBlock'.";
                             throw new UnmarshallingException($msg, $element);
                         }
 
@@ -101,7 +101,7 @@ class FeedbackElementMarshaller extends ContentMarshaller
      * @param array $elements
      * @return DOMElement
      */
-    protected function marshallChildrenKnown(QtiComponent $component, array $elements)
+    protected function marshallChildrenKnown(QtiComponent $component, array $elements): DOMElement
     {
         $element = $this->createElement($component);
         $this->fillElement($element, $component);
@@ -120,7 +120,7 @@ class FeedbackElementMarshaller extends ContentMarshaller
         return $element;
     }
 
-    protected function setLookupClasses()
+    protected function setLookupClasses(): void
     {
         $this->lookupClasses = ["qtism\\data\\content"];
     }

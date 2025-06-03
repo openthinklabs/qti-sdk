@@ -10,7 +10,7 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
  * @param bool $validate
  * @throws XmlStorageException
  */
-function testAssessmentItems(array $files, $validate = false)
+function testAssessmentItems(array $files, $validate = false): void
 {
     $loaded = 0;
     $totalSpent = 0;
@@ -29,7 +29,7 @@ function testAssessmentItems(array $files, $validate = false)
         $outcomeDeclarationCount = count($itemDoc->getDocumentComponent()->getComponentsByClassName('outcomeDeclaration'));
         $responseDeclarationCount = count($itemDoc->getDocumentComponent()->getComponentsByClassName('responseDeclaration'));
 
-        outputDescription("${responseDeclarationCount} resonseDeclaration(s), ${outcomeDeclarationCount} outcomeDeclaration(s)");
+        outputDescription("{$responseDeclarationCount} resonseDeclaration(s), {$outcomeDeclarationCount} outcomeDeclaration(s)");
         outputDescription('Memory usage is ' . (memory_get_usage() / 1024 ** 2) . ' MB');
         output('');
 
@@ -44,7 +44,7 @@ function testAssessmentItems(array $files, $validate = false)
  * @param bool $validate
  * @throws XmlStorageException
  */
-function testAssessmentTests(array $files, $validate = false)
+function testAssessmentTests(array $files, $validate = false): void
 {
     $loaded = 0;
     $totalSpent = 0;
@@ -64,7 +64,7 @@ function testAssessmentTests(array $files, $validate = false)
         $sectionCount = count($testDoc->getDocumentComponent()->getComponentsByClassName('assessmentSection'));
         $itemCount = count($testDoc->getDocumentComponent()->getComponentsByClassName('assessmentItemRef'));
 
-        outputDescription("${partCount} testPart(s), ${sectionCount} assessmentSection(s), ${itemCount} assessmentItemRef(s)");
+        outputDescription("{$partCount} testPart(s), {$sectionCount} assessmentSection(s), {$itemCount} assessmentItemRef(s)");
         outputDescription('Memory usage is ' . (memory_get_usage() / 1024 ** 2) . ' MB');
 
         output('');
@@ -78,7 +78,7 @@ function testAssessmentTests(array $files, $validate = false)
 /**
  * @param $msg
  */
-function outputTitle($msg)
+function outputTitle($msg): void
 {
     output('');
     output(str_repeat('+', strlen($msg)));
@@ -89,7 +89,7 @@ function outputTitle($msg)
 /**
  * @param $avg
  */
-function outputAverage($avg)
+function outputAverage($avg): void
 {
     output(sprintf('--> Average loading time is %.8f seconds.', $avg));
 }
@@ -97,17 +97,17 @@ function outputAverage($avg)
 /**
  * @param $msg
  */
-function outputDescription($msg)
+function outputDescription($msg): void
 {
-    output(" + ${msg}");
+    output(" + {$msg}");
 }
 
 /**
  * @param $msg
  */
-function output($msg)
+function output($msg): void
 {
-    echo "${msg}\n";
+    echo "{$msg}\n";
 }
 
 /**
@@ -115,7 +115,7 @@ function output($msg)
  * @param $end
  * @return mixed
  */
-function spentTime($start, $end)
+function spentTime($start, $end): mixed
 {
     $startTime = explode(' ', $start);
     $endTime = explode(' ', $end);

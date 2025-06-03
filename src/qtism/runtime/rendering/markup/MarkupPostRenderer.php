@@ -25,7 +25,6 @@ namespace qtism\runtime\rendering\markup;
 
 use qtism\runtime\rendering\Renderable;
 use qtism\runtime\rendering\RenderingException;
-use qtism\runtime\rendering\markup\Utils;
 
 /**
  * Class MarkupPostRenderer
@@ -33,14 +32,14 @@ use qtism\runtime\rendering\markup\Utils;
 class MarkupPostRenderer implements Renderable
 {
     /**
-     * Whether or not format the XML output.
+     * Whether format the XML output.
      *
      * @var bool
      */
     private $formatOutput = false;
 
     /**
-     * Whether or not clean up XML declarations.
+     * Whether clean up XML declarations.
      *
      * @var bool
      */
@@ -71,9 +70,9 @@ class MarkupPostRenderer implements Renderable
     /**
      * Create a new MarkupPostRenderer object.
      *
-     * @param bool $formatOutput Whether or not format the XML output.
-     * @param bool $cleanUpXmlDeclaration Whether or not clean up XML declaration (i.e. <?xml version="1.0" ... ?>).
-     * @param bool $templateOriented Whether or not replace qtism control statements (e.g. qtism-if, qtism-endif) or qtism functions (e.g. qtism-printedVariable) into PHP control statements/function calls.
+     * @param bool $formatOutput Whether format the XML output.
+     * @param bool $cleanUpXmlDeclaration Whether clean up XML declaration (i.e. <?xml version="1.0" ... ?>).
+     * @param bool $templateOriented Whether replace qtism control statements (e.g. qtism-if, qtism-endif) or qtism functions (e.g. qtism-printedVariable) into PHP control statements/function calls.
      */
     public function __construct($formatOutput = false, $cleanUpXmlDeclaration = false, $templateOriented = false)
     {
@@ -87,7 +86,7 @@ class MarkupPostRenderer implements Renderable
      *
      * @param bool $formatOutput
      */
-    public function formatOutput($formatOutput)
+    public function formatOutput($formatOutput): void
     {
         $this->formatOutput = $formatOutput;
     }
@@ -97,7 +96,7 @@ class MarkupPostRenderer implements Renderable
      *
      * @return bool
      */
-    public function mustFormatOutput()
+    public function mustFormatOutput(): bool
     {
         return $this->formatOutput;
     }
@@ -108,7 +107,7 @@ class MarkupPostRenderer implements Renderable
      *
      * @param bool $cleanUpXmlDeclaration
      */
-    public function cleanUpXmlDeclaration($cleanUpXmlDeclaration)
+    public function cleanUpXmlDeclaration($cleanUpXmlDeclaration): void
     {
         $this->cleanUpXmlDeclaration = $cleanUpXmlDeclaration;
     }
@@ -118,7 +117,7 @@ class MarkupPostRenderer implements Renderable
      *
      * @return bool
      */
-    public function mustCleanUpXmlDeclaration()
+    public function mustCleanUpXmlDeclaration(): bool
     {
         return $this->cleanUpXmlDeclaration;
     }
@@ -129,7 +128,7 @@ class MarkupPostRenderer implements Renderable
      *
      * @param bool $templateOriented
      */
-    public function templateOriented($templateOriented)
+    public function templateOriented($templateOriented): void
     {
         $this->templateOriented = $templateOriented;
     }
@@ -140,7 +139,7 @@ class MarkupPostRenderer implements Renderable
      *
      * @return bool
      */
-    public function isTemplateOriented()
+    public function isTemplateOriented(): bool
     {
         return $this->templateOriented;
     }
@@ -155,7 +154,7 @@ class MarkupPostRenderer implements Renderable
      *
      * @return array
      */
-    public function getFragments()
+    public function getFragments(): array
     {
         return $this->fragments;
     }
@@ -165,7 +164,7 @@ class MarkupPostRenderer implements Renderable
      *
      * @param array $fragments
      */
-    protected function setFragments(array $fragments)
+    protected function setFragments(array $fragments): void
     {
         $this->fragments = $fragments;
     }
@@ -175,7 +174,7 @@ class MarkupPostRenderer implements Renderable
      *
      * @param string $fragmentPrefix .
      */
-    public function setFragmentPrefix($fragmentPrefix)
+    public function setFragmentPrefix($fragmentPrefix): void
     {
         $this->fragmentPrefix = $fragmentPrefix;
     }
@@ -193,7 +192,7 @@ class MarkupPostRenderer implements Renderable
      * @return mixed|string|string[]|null
      * @throws RenderingException
      */
-    public function render($document)
+    public function render($document): string
     {
         if ($document->documentElement === null) {
             $msg = 'The XML Document to be rendered has no root element (i.e. it is empty).';
@@ -227,7 +226,7 @@ class MarkupPostRenderer implements Renderable
             $output = preg_replace('/<!--\s+qtism-endif\s+-->/iu', '<?php endif; ?>', $output);
 
             $className = Utils::class;
-            $call = "<?php echo ${className}::printVariable(\\1); ?>";
+            $call = "<?php echo {$className}::printVariable(\\1); ?>";
             $output = preg_replace('/<!--\s+qtism-printVariable\((.+?)\)\s+-->/iu', $call, $output);
 
             $matches = [];

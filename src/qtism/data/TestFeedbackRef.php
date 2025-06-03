@@ -39,7 +39,7 @@ class TestFeedbackRef extends QtiComponent
      * (referred to as atEnd).
      *
      * The value of an outcome variable is used in conjunction with the showHide and
-     * identifier attributes to determine whether or not the feedback is actually
+     * identifier attributes to determine whether the feedback is actually
      * shown in a similar way to feedbackElement (Item Model).
      *
      * @var int
@@ -112,7 +112,7 @@ class TestFeedbackRef extends QtiComponent
      *
      * @return int A value of the TestFeedbackAccess enumeration.
      */
-    public function getAccess()
+    public function getAccess(): int
     {
         return $this->access;
     }
@@ -126,12 +126,12 @@ class TestFeedbackRef extends QtiComponent
      * @param int $access A value of the TestFeedbackAccess enumeration.
      * @throws InvalidArgumentException If $access is not a value from the TestFeedbackAccess enumeration.
      */
-    public function setAccess($access)
+    public function setAccess($access): void
     {
         if (in_array($access, TestFeedbackAccess::asArray(), true)) {
             $this->access = $access;
         } else {
-            $msg = "'${access}' is not a value from the TestFeedbackAccess enumeration.";
+            $msg = "'{$access}' is not a value from the TestFeedbackAccess enumeration.";
             throw new InvalidArgumentException($msg);
         }
     }
@@ -141,7 +141,7 @@ class TestFeedbackRef extends QtiComponent
      *
      * @return string A QTI Identifier.
      */
-    public function getOutcomeIdentifier()
+    public function getOutcomeIdentifier(): string
     {
         return $this->outcomeIdentifier;
     }
@@ -152,12 +152,12 @@ class TestFeedbackRef extends QtiComponent
      * @param string $outcomeIdentifier A QTI Identifier.
      * @throws InvalidArgumentException If $outcomeIdentifier is not a valid QTI Identifier.
      */
-    public function setOutcomeIdentifier($outcomeIdentifier)
+    public function setOutcomeIdentifier($outcomeIdentifier): void
     {
-        if (Format::isIdentifier($outcomeIdentifier)) {
+        if (Format::isIdentifier((string)$outcomeIdentifier)) {
             $this->outcomeIdentifier = $outcomeIdentifier;
         } else {
-            $msg = "'${outcomeIdentifier}' is not a valid QTI Identifier.";
+            $msg = "'{$outcomeIdentifier}' is not a valid QTI Identifier.";
             throw new InvalidArgumentException($msg);
         }
     }
@@ -167,7 +167,7 @@ class TestFeedbackRef extends QtiComponent
      *
      * @return string A QTI identifier.
      */
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return $this->identifier;
     }
@@ -178,12 +178,12 @@ class TestFeedbackRef extends QtiComponent
      * @param string $identifier A QTI Identifier.
      * @throws InvalidArgumentException If $identifier is not a valid QTI Identifier.
      */
-    public function setIdentifier($identifier)
+    public function setIdentifier($identifier): void
     {
-        if (Format::isIdentifier($identifier, false)) {
+        if (Format::isIdentifier((string)$identifier, false)) {
             $this->identifier = $identifier;
         } else {
-            $msg = "'${identifier}' is not a valid QTI Identifier.";
+            $msg = "'{$identifier}' is not a valid QTI Identifier.";
             throw new InvalidArgumentException($msg);
         }
     }
@@ -193,7 +193,7 @@ class TestFeedbackRef extends QtiComponent
      *
      * @return int A value from the ShowHide enumeration.
      */
-    public function getShowHide()
+    public function getShowHide(): int
     {
         return $this->showHide;
     }
@@ -204,12 +204,12 @@ class TestFeedbackRef extends QtiComponent
      * @param bool $showHide A value from the ShowHide enumeration.
      * @throws InvalidArgumentException If $showHide is not a value from the ShowHide enumeration.
      */
-    public function setShowHide($showHide)
+    public function setShowHide($showHide): void
     {
         if (in_array($showHide, ShowHide::asArray(), true)) {
             $this->showHide = $showHide;
         } else {
-            $msg = "'${showHide}' is not a value from the ShowHide enumeration.";
+            $msg = "'{$showHide}' is not a value from the ShowHide enumeration.";
             throw new InvalidArgumentException($msg);
         }
     }
@@ -219,7 +219,7 @@ class TestFeedbackRef extends QtiComponent
      *
      * @return string
      */
-    public function getHref()
+    public function getHref(): string
     {
         return $this->href;
     }
@@ -229,12 +229,12 @@ class TestFeedbackRef extends QtiComponent
      *
      * @param string $href
      */
-    public function setHref($href)
+    public function setHref($href): void
     {
         if (Format::isUri($href) === true) {
             $this->href = $href;
         } else {
-            $msg = "'${href}' is not a valid URI.";
+            $msg = "'{$href}' is not a valid URI.";
             throw new InvalidArgumentException($msg);
         }
     }
@@ -242,7 +242,7 @@ class TestFeedbackRef extends QtiComponent
     /**
      * @return string
      */
-    public function getQtiClassName()
+    public function getQtiClassName(): string
     {
         return 'testFeedbackRef';
     }
@@ -250,7 +250,7 @@ class TestFeedbackRef extends QtiComponent
     /**
      * @return QtiComponentCollection
      */
-    public function getComponents()
+    public function getComponents(): QtiComponentCollection
     {
         return new QtiComponentCollection();
     }

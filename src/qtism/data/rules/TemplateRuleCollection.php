@@ -33,12 +33,12 @@ use qtism\data\QtiComponentCollection;
 class TemplateRuleCollection extends QtiComponentCollection
 {
     /**
-     * Check whether or not $value is an instance of TemplateRule.
+     * Check whether $value is an instance of TemplateRule.
      *
      * @param mixed $value
      * @throws InvalidArgumentException If $value is not an instance of TemplateRule.
      */
-    protected function checkType($value)
+    protected function checkType($value): void
     {
         if (!$value instanceof TemplateRule) {
             $msg = 'A TemplateRuleCollection only accepts to store TemplateRule objects.';

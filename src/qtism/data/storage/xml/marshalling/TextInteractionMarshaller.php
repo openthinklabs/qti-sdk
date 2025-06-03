@@ -43,7 +43,7 @@ class TextInteractionMarshaller extends Marshaller
      * @throws MarshallerNotFoundException
      * @throws MarshallingException
      */
-    protected function marshall(QtiComponent $component)
+    protected function marshall(QtiComponent $component): DOMElement
     {
         $element = $this->createElement($component);
         $version = $this->getVersion();
@@ -71,7 +71,7 @@ class TextInteractionMarshaller extends Marshaller
         }
 
         if ($component->hasXmlBase() === true) {
-            self::setXmlBase($element, $component->setXmlBase());
+            self::setXmlBase($element, $component->getXmlBase());
         }
 
         if ($element->localName === 'extendedTextInteraction') {
@@ -109,7 +109,7 @@ class TextInteractionMarshaller extends Marshaller
      * @throws MarshallerNotFoundException
      * @throws UnmarshallingException
      */
-    protected function unmarshall(DOMElement $element)
+    protected function unmarshall(DOMElement $element): QtiComponent
     {
         $version = $this->getVersion();
 
@@ -120,7 +120,7 @@ class TextInteractionMarshaller extends Marshaller
                 $class = 'qtism\\data\\content\\interactions\\' . $name;
                 $component = new $class($responseIdentifier);
             } catch (InvalidArgumentException $e) {
-                $msg = "The value '${responseIdentifier}' of the 'responseIdentifier' attribute of the '" . $element->localName . "' element is not a valid identifier.";
+                $msg = "The value '{$responseIdentifier}' of the 'responseIdentifier' attribute of the '" . $element->localName . "' element is not a valid identifier.";
                 throw new UnmarshallingException($msg, $element, $e);
             }
 
@@ -183,7 +183,7 @@ class TextInteractionMarshaller extends Marshaller
     /**
      * @return string
      */
-    public function getExpectedQtiClassName()
+    public function getExpectedQtiClassName(): string
     {
         return '';
     }

@@ -87,7 +87,7 @@ abstract class AbstractQtiBinaryStorage extends AbstractStorage
      *
      * @param BinaryAssessmentTestSeeker $seeker An AssessmentTestSeeker object.
      */
-    protected function setSeeker(BinaryAssessmentTestSeeker $seeker)
+    protected function setSeeker(BinaryAssessmentTestSeeker $seeker): void
     {
         $this->seeker = $seeker;
     }
@@ -97,7 +97,7 @@ abstract class AbstractQtiBinaryStorage extends AbstractStorage
      *
      * @return BinaryAssessmentTestSeeker An AssessmentTestSeeker object.
      */
-    protected function getSeeker()
+    protected function getSeeker(): BinaryAssessmentTestSeeker
     {
         return $this->seeker;
     }
@@ -110,7 +110,7 @@ abstract class AbstractQtiBinaryStorage extends AbstractStorage
      * @return AssessmentTestSession An AssessmentTestSession object.
      * @throws StorageException
      */
-    public function instantiate($config = 0, $sessionId = '')
+    public function instantiate($config = 0, $sessionId = ''): AssessmentTestSession
     {
         // If not provided, generate a session ID.
         if (empty($sessionId)) {
@@ -134,7 +134,7 @@ abstract class AbstractQtiBinaryStorage extends AbstractStorage
      * @param AssessmentTestSession $assessmentTestSession
      * @throws StorageException
      */
-    public function persist(AssessmentTestSession $assessmentTestSession)
+    public function persist(AssessmentTestSession $assessmentTestSession): void
     {
         try {
             $stream = new MemoryStream();
@@ -149,7 +149,7 @@ abstract class AbstractQtiBinaryStorage extends AbstractStorage
 
             // Write the current position in the route.
             $route = $assessmentTestSession->getRoute();
-            $access->writeTinyInt($route->getPosition());
+            $access->writeInteger($route->getPosition());
 
             // persist time reference.
             $timeReference = $assessmentTestSession->getTimeReference();
@@ -174,7 +174,7 @@ abstract class AbstractQtiBinaryStorage extends AbstractStorage
             $access->writeShort($assessmentTestSession->getConfig());
 
             // -- Persist the Route of the AssessmentTestSession and the related item sessions.
-            $access->writeTinyInt($route->count());
+            $access->writeInteger($route->count());
             $itemSessionStore = $assessmentTestSession->getAssessmentItemSessionStore();
             $pendingResponseStore = $assessmentTestSession->getPendingResponseStore();
 
@@ -233,7 +233,7 @@ abstract class AbstractQtiBinaryStorage extends AbstractStorage
             $stream->close();
         } catch (Exception $e) {
             $sessionId = $assessmentTestSession->getSessionId();
-            $msg = "An error occurred while persisting AssessmentTestSession with ID '${sessionId}': " . $e->getMessage();
+            $msg = "An error occurred while persisting AssessmentTestSession with ID '{$sessionId}': " . $e->getMessage();
             throw new StorageException($msg, StorageException::PERSISTENCE, $e);
         }
     }
@@ -245,7 +245,7 @@ abstract class AbstractQtiBinaryStorage extends AbstractStorage
      * @return AssessmentTestSession An AssessmentTestSession object.
      * @throws StorageException If the AssessmentTestSession could not be retrieved from persistent binary storage.
      */
-    public function retrieve($sessionId)
+    public function retrieve($sessionId): AssessmentTestSession
     {
         try {
             $stream = $this->getRetrievalStream($sessionId);
@@ -257,7 +257,7 @@ abstract class AbstractQtiBinaryStorage extends AbstractStorage
 
             // Deal with intrinsic values of the Test Session.
             $assessmentTestSessionState = $access->readTinyInt();
-            $currentPosition = $access->readTinyInt();
+            $currentPosition = ($this->version->storesRouteCountAsInteger()) ? $access->readInteger() : $access->readTinyInt();
 
             if ($access->readBoolean() === true) {
                 $timeReference = $access->readDateTime();
@@ -281,7 +281,7 @@ abstract class AbstractQtiBinaryStorage extends AbstractStorage
             $lastOccurenceUpdate = new SplObjectStorage();
             $itemSessionStore = new AssessmentItemSessionStore();
             $pendingResponseStore = new PendingResponseStore();
-            $routeCount = $access->readTinyInt();
+            $routeCount = ($this->version->storesRouteCountAsInteger()) ? $access->readInteger() : $access->readTinyInt();
 
             // Create the item session factory that will be used to instantiate
             // new item sessions.
@@ -332,15 +332,14 @@ abstract class AbstractQtiBinaryStorage extends AbstractStorage
 
             // Build the duration store.
             $durationStore = new DurationStore();
-                $durationCount = $access->readShort();
-                for ($i = 0; $i < $durationCount; $i++) {
-                    $varName = $access->readString();
-                    $durationVariable = new OutcomeVariable($varName, Cardinality::SINGLE, BaseType::DURATION);
-                    $access->readVariableValue($durationVariable);
-                    $durationStore->setVariable($durationVariable);
-                }
-
-                $assessmentTestSession->setDurationStore($durationStore);
+            $durationCount = $access->readShort();
+            for ($i = 0; $i < $durationCount; $i++) {
+                $varName = $access->readString();
+                $durationVariable = new OutcomeVariable($varName, Cardinality::SINGLE, BaseType::DURATION);
+                $access->readVariableValue($durationVariable);
+                $durationStore->setVariable($durationVariable);
+            }
+            $assessmentTestSession->setDurationStore($durationStore);
 
             $stream->close();
 
@@ -360,7 +359,7 @@ abstract class AbstractQtiBinaryStorage extends AbstractStorage
      * @return MemoryStream A MemoryStream object.
      * @throws RuntimeException If an error occurs.
      */
-    abstract protected function getRetrievalStream($sessionId);
+    abstract protected function getRetrievalStream($sessionId): MemoryStream;
 
     /**
      * Persist A MemoryStream that contains the binary data representing $assessmentTestSession in an appropriate location.
@@ -378,5 +377,5 @@ abstract class AbstractQtiBinaryStorage extends AbstractStorage
      * @param IStream $stream
      * @return BinaryStreamAccess
      */
-    abstract protected function createBinaryStreamAccess(IStream $stream);
+    abstract protected function createBinaryStreamAccess(IStream $stream): BinaryStreamAccess;
 }

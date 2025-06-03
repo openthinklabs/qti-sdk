@@ -70,8 +70,11 @@ class TemplateCondition extends QtiComponent implements TemplateRule
      * @param TemplateElseIfCollection $templateElseIfs The collection of TemplateElseIf objects composing the template condition.
      * @param TemplateElse $templateElse An optional TemplateElse object composing the template condition.
      */
-    public function __construct(TemplateIf $templateIf, TemplateElseIfCollection $templateElseIfs = null, TemplateElse $templateElse = null)
-    {
+    public function __construct(
+        TemplateIf $templateIf,
+        ?TemplateElseIfCollection $templateElseIfs = null,
+        ?TemplateElse $templateElse = null
+    ) {
         $this->setTemplateIf($templateIf);
         $this->setTemplateElseIfs($templateElseIfs ?? new TemplateElseIfCollection());
         $this->setTemplateElse($templateElse);
@@ -82,7 +85,7 @@ class TemplateCondition extends QtiComponent implements TemplateRule
      *
      * @param TemplateIf $templateIf A TemplateIf object.
      */
-    public function setTemplateIf(TemplateIf $templateIf)
+    public function setTemplateIf(TemplateIf $templateIf): void
     {
         $this->templateIf = $templateIf;
     }
@@ -92,7 +95,7 @@ class TemplateCondition extends QtiComponent implements TemplateRule
      *
      * @return TemplateIf A TemplateIf object.
      */
-    public function getTemplateIf()
+    public function getTemplateIf(): TemplateIf
     {
         return $this->templateIf;
     }
@@ -102,7 +105,7 @@ class TemplateCondition extends QtiComponent implements TemplateRule
      *
      * @param TemplateElseIfCollection $templateElseIfs A collection of TemplateElseIf objects.
      */
-    public function setTemplateElseIfs(TemplateElseIfCollection $templateElseIfs)
+    public function setTemplateElseIfs(TemplateElseIfCollection $templateElseIfs): void
     {
         $this->templateElseIfs = $templateElseIfs;
     }
@@ -112,7 +115,7 @@ class TemplateCondition extends QtiComponent implements TemplateRule
      *
      * @return TemplateElseIfCollection A collection of TemplateElseIf objects.
      */
-    public function getTemplateElseIfs()
+    public function getTemplateElseIfs(): TemplateElseIfCollection
     {
         return $this->templateElseIfs;
     }
@@ -122,7 +125,7 @@ class TemplateCondition extends QtiComponent implements TemplateRule
      *
      * @param TemplateElse $templateElse A TemplateElse object.
      */
-    public function setTemplateElse(TemplateElse $templateElse = null)
+    public function setTemplateElse(TemplateElse $templateElse = null): void
     {
         $this->templateElse = $templateElse;
     }
@@ -130,27 +133,27 @@ class TemplateCondition extends QtiComponent implements TemplateRule
     /**
      * Get the TemplateElse object composing the template condition.
      *
-     * @return TemplateElse A TemplateElse object.
+     * @return TemplateElse|null A TemplateElse object.
      */
-    public function getTemplateElse()
+    public function getTemplateElse(): ?TemplateElse
     {
         return $this->templateElse;
     }
 
     /**
-     * Whether or not a TemplateElse object is defined for this template condition.
+     * Whether a TemplateElse object is defined for this template condition.
      *
      * @return bool
      */
-    public function hasTemplateElse()
+    public function hasTemplateElse(): bool
     {
         return $this->getTemplateElse() !== null;
     }
 
     /**
-     * @return array|QtiComponentCollection
+     * @return QtiComponentCollection
      */
-    public function getComponents()
+    public function getComponents(): QtiComponentCollection
     {
         $merge = array_merge([$this->getTemplateIf()], $this->getTemplateElseIfs()->getArrayCopy());
         $components = new QtiComponentCollection($merge);
@@ -164,7 +167,7 @@ class TemplateCondition extends QtiComponent implements TemplateRule
     /**
      * @return string
      */
-    public function getQtiClassName()
+    public function getQtiClassName(): string
     {
         return 'templateCondition';
     }

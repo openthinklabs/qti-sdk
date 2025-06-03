@@ -51,10 +51,10 @@ class BeanProperty
         try {
             $this->setProperty(new ReflectionProperty($class, $name));
         } catch (ReflectionException $e) {
-            $msg = "The class property with name '${name}' does not exist in class '${class}'.";
+            $msg = "The class property with name '{$name}' does not exist in class '{$class}'.";
             throw new BeanException($msg, BeanException::NO_PROPERTY, $e);
         } catch (BeanException $e) {
-            $msg = "The property with name '${name}' for class '${class}' is not annotated.";
+            $msg = "The property with name '{$name}' for class '{$class}' is not annotated.";
             throw new BeanException($msg, BeanException::NO_PROPERTY, $e);
         }
     }
@@ -64,7 +64,7 @@ class BeanProperty
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->getProperty()->getName();
     }
@@ -75,7 +75,7 @@ class BeanProperty
      * @param ReflectionProperty $property A ReflectionProperty object.
      * @throws BeanException If the given $property is not annotated with @qtism-bean-property.
      */
-    protected function setProperty(ReflectionProperty $property)
+    protected function setProperty(ReflectionProperty $property): void
     {
         if (mb_strpos($property->getDocComment(), Bean::ANNOTATION_PROPERTY, 0, 'UTF-8') !== false) {
             $this->property = $property;
@@ -90,7 +90,7 @@ class BeanProperty
      *
      * @return ReflectionProperty A ReflectionProperty object.
      */
-    public function getProperty()
+    public function getProperty(): ReflectionProperty
     {
         return $this->property;
     }

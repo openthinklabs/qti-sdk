@@ -42,7 +42,7 @@ class TemplateDeclaration extends VariableDeclaration
     /**
      * From IMS QTI:
      *
-     * This attribute determines whether or not the template variable's
+     * This attribute determines whether the template variable's
      * value should be substituted for object parameter values that match its name.
      * See param for more information.
      *
@@ -54,7 +54,7 @@ class TemplateDeclaration extends VariableDeclaration
     /**
      * From IMS QTI:
      *
-     * This attribute determines whether or not the template variable's value should
+     * This attribute determines whether the template variable's value should
      * be substituted for identifiers that match its name in MathML expressions.
      * See Combining Template Variables and MathML for more information.
      *
@@ -77,13 +77,13 @@ class TemplateDeclaration extends VariableDeclaration
     }
 
     /**
-     * Set whether or not the template variable's value should be substituted for
+     * Set whether the template variable's value should be substituted for
      * object parameters.
      *
      * @param bool $paramVariable A boolean value.
      * @throws InvalidArgumentException If $paramVariable is not a boolean value.
      */
-    public function setParamVariable($paramVariable)
+    public function setParamVariable($paramVariable): void
     {
         if (is_bool($paramVariable)) {
             $this->paramVariable = $paramVariable;
@@ -94,12 +94,12 @@ class TemplateDeclaration extends VariableDeclaration
     }
 
     /**
-     * Lets you know whether or not the template variable's value should be substituted for
+     * Lets you know whether the template variable's value should be substituted for
      * object parameters.
      *
      * @return bool
      */
-    public function isParamVariable()
+    public function isParamVariable(): bool
     {
         return $this->paramVariable;
     }
@@ -111,7 +111,7 @@ class TemplateDeclaration extends VariableDeclaration
      * @param bool $mathVariable A boolean value.
      * @throws InvalidArgumentException If $mathVariable is not a boolean value.
      */
-    public function setMathVariable($mathVariable)
+    public function setMathVariable($mathVariable): void
     {
         if (is_bool($mathVariable)) {
             $this->mathVariable = $mathVariable;
@@ -127,7 +127,7 @@ class TemplateDeclaration extends VariableDeclaration
      *
      * @return bool
      */
-    public function isMathVariable()
+    public function isMathVariable(): bool
     {
         return $this->mathVariable;
     }
@@ -135,7 +135,7 @@ class TemplateDeclaration extends VariableDeclaration
     /**
      * @return string
      */
-    public function getQtiClassName()
+    public function getQtiClassName(): string
     {
         return 'templateDeclaration';
     }

@@ -51,13 +51,13 @@ class LocalFileResolver extends FileResolver
      * @return string href
      * @throws ResolutionException If $url cannot be resolved.
      */
-    public function resolve($url)
+    public function resolve($url): string
     {
         $baseUrl = Utils::sanitizeUri($this->getBasePath());
         $baseDir = pathinfo($baseUrl, PATHINFO_DIRNAME);
 
         if (empty($baseDir)) {
-            $msg = "The base directory of the document ('${baseDir}') could not be resolved.";
+            $msg = "The base directory of the document ('{$baseDir}') could not be resolved.";
             throw new ResolutionException($msg);
         }
 

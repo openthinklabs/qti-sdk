@@ -62,7 +62,7 @@ class EqualRoundedProcessor extends OperatorProcessor
      * @return QtiBoolean|null A boolean with a value of true if the two expressions are numerically equal after rounding and false if they are not. If either sub-expression is NULL, the operator results in NULL.
      * @throws OperatorProcessingException
      */
-    public function process()
+    public function process(): ?QtiBoolean
     {
         $operands = $this->getOperands();
 
@@ -92,10 +92,10 @@ class EqualRoundedProcessor extends OperatorProcessor
             $varValue = $state[$varName];
 
             if ($varValue === null) {
-                $msg = "The variable with name '${varName}' could not be resolved.";
+                $msg = "The variable with name '{$varName}' could not be resolved.";
                 throw new OperatorProcessingException($msg, $this, OperatorProcessingException::NONEXISTENT_VARIABLE);
             } elseif (!$varValue instanceof QtiInteger) {
-                $msg = "The variable with name '${varName}' is not an integer.";
+                $msg = "The variable with name '{$varName}' is not an integer.";
                 throw new OperatorProcessingException($msg, $this, OperatorProcessingException::WRONG_VARIABLE_BASETYPE);
             }
 
@@ -113,7 +113,7 @@ class EqualRoundedProcessor extends OperatorProcessor
             try {
                 $rounded[] = $roundToProcessor->process();
             } catch (OperatorProcessingException $e) {
-                $msg = "An error occurred while rounding '${operand}'.";
+                $msg = "An error occurred while rounding '{$operand}'.";
                 throw new OperatorProcessingException($msg, $this, OperatorProcessingException::LOGIC_ERROR, $e);
             }
         }
@@ -124,7 +124,7 @@ class EqualRoundedProcessor extends OperatorProcessor
     /**
      * @return string
      */
-    protected function getExpressionType()
+    protected function getExpressionType(): string
     {
         return EqualRounded::class;
     }

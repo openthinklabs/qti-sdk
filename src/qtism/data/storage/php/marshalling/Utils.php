@@ -57,7 +57,7 @@ class Utils
      * @return string A variable name.
      * @throws InvalidArgumentException If $occurence is not a positive integer or if $value cannot be handled by this method.
      */
-    public static function variableName($value, $occurence = 0)
+    public static function variableName($value, $occurence = 0): string
     {
         if (is_int($occurence) === false || $occurence < 0) {
             $msg = "The 'occurence' argument must be a positive integer (>= 0).";
@@ -68,7 +68,7 @@ class Utils
             $object = new ReflectionObject($value);
             $className = mb_strtolower($object->getShortName(), 'UTF-8');
 
-            return "${className}_${occurence}";
+            return "{$className}_{$occurence}";
         } elseif (is_scalar($value)) {
             return gettype($value) . '_' . $occurence;
         } elseif (is_array($value)) {
